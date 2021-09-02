@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?colorPrimary"
+    android:orientation="vertical">
+
+    <androidx.appcompat.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?colorPrimary"
+        android:paddingTop="@dimen/standardMargin2x">
+
+        <ImageView
+            android:id="@+id/backImg"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:foreground="?attr/selectableItemBackground"
+            android:padding="14dp"
+            android:src="@drawable/gradient_back_fa"
+            />
+
+        <com.dust.exmusic.customviews.CTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginHorizontal="@dimen/standardMargin1.5x"
+            android:text="@string/settings"
+            android:textColor="?android:textColor"
+            android:textSize="@dimen/standardMargin2x"
+            android:textStyle="bold" />
+    </androidx.appcompat.widget.Toolbar>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/standardMargin1.5x"
+                android:layout_marginTop="@dimen/standardMargin1.5x"
+                android:backgroundTint="?colorOnPrimary"
+                app:cardCornerRadius="@dimen/standardMargin"
+                app:cardElevation="@dimen/standardMargin0.5x">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <com.dust.exmusic.customviews.CTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:layout_marginHorizontal="@dimen/standardMargin1.5x"
+                        android:layout_marginTop="@dimen/standardMargin0.5x"
+                        android:text="@string/audioQuality"
+                        android:textColor="@color/purpleMain"
+                        android:textSize="@dimen/settingTitleComponent"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:id="@+id/soundSettings"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/standardMargin"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:orientation="vertical">
+
+                        <com.dust.exmusic.customviews.CTextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end"
+                            android:layout_marginHorizontal="@dimen/standardMargin2x"
+                            android:layout_marginTop="@dimen/standardMargin"
+                            android:text="@string/audioSettings"
+                            android:textColor="?android:textColor"
+                            android:textSize="@dimen/standardMargin1.5x"
+                            android:textStyle="bold" />
+
+                        <com.dust.exmusic.customviews.CTextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end"
+                            android:layout_marginHorizontal="@dimen/standardMargin2x"
+                            android:layout_marginTop="@dimen/standardMargin0.5x"
+                            android:layout_marginBottom="@dimen/standardMargin"
+                            android:text="@string/audioSettingDesc"
+                            android:textColor="?colorAccent"
+                            android:textSize="@dimen/standardMargintext1.5x" />
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/standardMargin1.5x"
+                android:layout_marginTop="@dimen/standardMargin1.5x"
+                app:cardCornerRadius="@dimen/standardMargin"
+                android:backgroundTint="?colorOnPrimary"
+                app:cardElevation="@dimen/standardMargin0.5x">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <com.dust.exmusic.customviews.CTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:layout_marginHorizontal="@dimen/standardMargin1.5x"
+                        android:text="@string/general"
+                        android:layout_marginTop="@dimen/standardMargin0.5x"
+                        android:textColor="@color/purpleMain"
+                        android:textSize="@dimen/settingTitleComponent"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:id="@+id/languageSettings"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/standardMargin"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:orientation="vertical">
+
+                        <com.dust.exmusic.customviews.CTextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end"
+                            android:layout_marginHorizontal="@dimen/standardMargin2x"
+                            android:layout_marginTop="@dimen/standardMargin"
+                            android:text="@string/language"
+                            android:textColor="?android:textColor"
+                            android:textSize="@dimen/standardMargin1.5x"
+                            android:textStyle="bold" />
+
+                        <com.dust.exmusic.customviews.CTextView
+                            android:id="@+id/currentLanguage"
+
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end"
+                            android:layout_marginHorizontal="@dimen/standardMargin2x"
+                            android:layout_marginTop="@dimen/standardMargin0.5x"
+                            android:layout_marginBottom="@dimen/standardMargin"
+                            android:text="@string/persian"
+                            android:textColor="?colorAccent"
+                            android:textSize="@dimen/standardMargintext1.5x" />
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/standardMargin1.5x"
+                android:layout_marginTop="@dimen/standardMargin1.5x"
+                app:cardCornerRadius="@dimen/standardMargin"
+                android:backgroundTint="?colorOnPrimary"
+                app:cardElevation="@dimen/standardMargin0.5x">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <com.dust.exmusic.customviews.CTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:layout_marginHorizontal="@dimen/standardMargin1.5x"
+                        android:text="@string/customize"
+                        android:layout_marginTop="@dimen/standardMargin0.5x"
+                        android:textColor="@color/purpleMain"
+                        android:textSize="@dimen/settingTitleComponent"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:id="@+id/themeSettings"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/standardMargin"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:orientation="vertical">
+
+                        <com.dust.exmusic.customviews.CTextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end"
+                            android:layout_marginHorizontal="@dimen/standardMargin2x"
+                            android:layout_marginTop="@dimen/standardMargin"
+                            android:text="@string/theme"
+                            android:textColor="?android:textColor"
+                            android:textSize="@dimen/standardMargin1.5x"
+                            android:textStyle="bold" />
+
+                        <com.dust.exmusic.customviews.CTextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end"
+                            android:layout_marginHorizontal="@dimen/standardMargin2x"
+                            android:layout_marginTop="@dimen/standardMargin0.5x"
+                            android:layout_marginBottom="@dimen/standardMargin"
+                            android:text="@string/themeSettingsDes"
+                            android:textColor="?colorAccent"
+                            android:textSize="@dimen/standardMargintext1.5x" />
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/standardMargin1.5x"
+                android:layout_marginTop="@dimen/standardMargin1.5x"
+                android:layout_marginBottom="@dimen/standardMargin6x"
+                android:backgroundTint="?colorOnPrimary"
+                app:cardCornerRadius="@dimen/standardMargin"
+                app:cardElevation="@dimen/standardMargin0.5x">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <com.dust.exmusic.customviews.CTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:layout_marginHorizontal="@dimen/standardMargin1.5x"
+                        android:text="@string/aboutUs"
+                        android:textColor="@color/purpleMain"
+                        android:layout_marginTop="@dimen/standardMargin0.5x"
+                        android:textSize="@dimen/settingTitleComponent"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:id="@+id/versionSettings"
+                        android:layout_width="match_parent"
+                        android:layout_marginHorizontal="@dimen/standardMargin"
+                        android:layout_marginTop="@dimen/standardMargin"
+                        android:layout_height="wrap_content"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:orientation="vertical">
+
+                        <com.dust.exmusic.customviews.CTextView
+                            android:id="@+id/version"
+                            android:layout_width="match_parent"
+                            android:layout_height="30dp"
+                            android:layout_gravity="end"
+                            android:layout_marginHorizontal="@dimen/standardMargin2x"
+                            android:layout_marginTop="@dimen/standardMargin"
+                            android:layout_marginBottom="@dimen/standardMargin"
+                            android:gravity="center_vertical"
+                            android:text="@string/version"
+                            android:textColor="?android:textColor"
+                            android:textSize="@dimen/standardMargin1.5x"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/sourceSettings"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="@dimen/standardMargin"
+                        android:layout_marginBottom="@dimen/standardMargin"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:orientation="vertical">
+
+                        <com.dust.exmusic.customviews.CTextView
+                            android:layout_width="match_parent"
+                            android:layout_height="30dp"
+                            android:layout_gravity="end"
+                            android:layout_marginHorizontal="@dimen/standardMargin2x"
+                            android:layout_marginTop="@dimen/standardMargin"
+                            android:layout_marginBottom="@dimen/standardMargin"
+                            android:gravity="center_vertical"
+                            android:text="@string/sourceLisence"
+                            android:textColor="?android:textColor"
+                            android:textSize="@dimen/standardMargin1.5x"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

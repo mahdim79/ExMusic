@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="?colorPrimary"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedMain"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:descendantFocusability="blocksDescendants"
+        android:backgroundTint="?colorPrimary">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:descendantFocusability="blocksDescendants"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.Toolbar
+                android:layout_width="match_parent"
+                android:background="?colorPrimary"
+                android:paddingTop="@dimen/standardMargin2x"
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:id="@+id/backImg"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:padding="14dp"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:src="@drawable/gradient_back_fa"
+                    />
+
+                <com.dust.exmusic.customviews.CTextView
+                    android:id="@+id/title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/artists"
+                    android:textSize="@dimen/standardMargin2x"
+                    android:layout_gravity="end"
+                    android:textColor="?android:textColor"
+                    android:textStyle="bold"
+                    android:layout_marginHorizontal="@dimen/standardMargin1.5x"
+                    />
+            </androidx.appcompat.widget.Toolbar>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/mainRecyclerView"
+                    android:layout_marginBottom="@dimen/standardMargin6x"
+                    android:scrollbars="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+                <LinearLayout
+                    android:id="@+id/nothing_Linear"
+                    android:layout_width="match_parent"
+                    android:visibility="gone"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/standardMargin2x"
+                        android:src="@drawable/empty_music_list"/>
+
+                    <com.dust.exmusic.customviews.CTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/thereIsNothingHere"
+                        android:textSize="@dimen/standardMargin1.5x"
+                        android:gravity="center"
+                        android:layout_marginTop="@dimen/standardMargin"
+                        android:textColor="@color/purpleMain"/>
+                </LinearLayout>
+
+            </RelativeLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/floatingButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start"
+        android:backgroundTint="@color/purpleMain"
+        android:layout_marginStart="@dimen/standardMargin4x"
+        app:borderWidth="0dp"
+        android:layout_marginBottom="@dimen/standardMargin8x"
+        android:tint="@color/white"
+        android:src="@drawable/gradient_search"
+        app:fabSize="normal"
+        />
+
+</FrameLayout>

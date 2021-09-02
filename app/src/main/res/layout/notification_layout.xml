@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:layoutDirection="ltr"
+    android:background="@color/notificationBackground"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_weight="35"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:adjustViewBounds="true"
+            android:layout_gravity="center"
+            android:scaleType="centerCrop"
+            android:src="@drawable/notification"/>
+
+        <ImageView
+            android:id="@+id/mainImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:adjustViewBounds="true"
+            android:scaleType="centerCrop"
+            android:src="@drawable/avatar"/>
+
+    </FrameLayout>
+
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_weight="65"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_height="match_parent">
+            <TextView
+                android:id="@+id/musicName"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="10"
+                android:textDirection="ltr"
+                android:textStyle="bold"
+                android:ellipsize="marquee"
+                android:focusableInTouchMode="true"
+                android:focusable="true"
+                android:textSize="@dimen/standardMargin1.5x"
+                android:textColor="@color/white"
+                android:layout_marginTop="@dimen/standardMargin0.5x"
+                android:layout_marginHorizontal="@dimen/standardMargin"/>
+
+            <TextView
+                android:id="@+id/artistName"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="20"
+                android:textDirection="ltr"
+                android:ellipsize="marquee"
+                android:focusableInTouchMode="true"
+                android:focusable="true"
+                android:textSize="12dp"
+                android:textColor="@color/light_black"
+                android:layout_marginHorizontal="@dimen/standardMargin"/>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/light_black" />
+
+            <LinearLayout
+                android:id="@+id/controlerLinear"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="20"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/rewind"
+                    android:layout_width="0dp"
+                    android:layout_weight="25"
+                    android:padding="@dimen/standardMargin"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/gradient_rewind"/>
+
+                <ImageView
+                    android:id="@+id/play"
+                    android:layout_width="0dp"
+                    android:padding="@dimen/standardMargin"
+                    android:layout_weight="25"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/gradient_play"/>
+
+                <ImageView
+                    android:id="@+id/forward"
+                    android:layout_width="0dp"
+                    android:padding="@dimen/standardMargin"
+                    android:layout_weight="25"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/gradient_forward"/>
+
+                <ImageView
+                    android:id="@+id/close"
+                    android:layout_width="0dp"
+                    android:padding="@dimen/standardMargin"
+                    android:layout_weight="25"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/gradient_close"/>
+            </LinearLayout>
+        </LinearLayout>
+
+    </RelativeLayout>
+
+
+
+
+</LinearLayout>

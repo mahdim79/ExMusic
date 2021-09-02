@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="65">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/musicImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:scaleType="centerCrop"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="0dp"
+            android:layout_marginBottom="0dp"
+            android:paddingEnd="90dp"
+            android:paddingStart="90dp"
+            android:paddingBottom="48dp"
+            android:paddingTop="112dp"
+            />
+
+    </RelativeLayout>
+    <LinearLayout
+        android:id="@+id/musicDescriptions"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="10"
+        android:orientation="vertical"
+        android:gravity="center">
+        <com.dust.exmusic.customviews.CTextView
+            android:id="@+id/txtName"
+            android:layout_width="240dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="marquee"
+            android:singleLine="true"
+            android:focusableInTouchMode="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:textColor="@color/black_normal"
+            tools:text="خیلی میخامت"
+            />
+        <com.dust.exmusic.customviews.CTextView
+            android:id="@+id/txtArtistName"
+            android:layout_width="240dp"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black_normal"
+            android:ellipsize="marquee"
+            android:singleLine="true"
+            android:focusableInTouchMode="true"
+            android:focusable="true"
+            android:gravity="center"
+            tools:text="سالار عقیلی"
+            />
+        <com.dust.exmusic.customviews.CTextView
+            android:id="@+id/txtOtherDetails"
+            android:layout_width="240dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="marquee"
+            android:singleLine="true"
+            android:focusableInTouchMode="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:textColor="@color/black_normal"
+            tools:text="musicsara.ir"
+            />
+    </LinearLayout>
+
+</LinearLayout>

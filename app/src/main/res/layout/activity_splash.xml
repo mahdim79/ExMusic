@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.SplashActivity">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
+        android:alpha="0.6"
+        android:src="@drawable/splash_back"/>
+
+    <TextView
+        android:id="@+id/textMain"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:shadowColor="@color/purpleMain"
+        android:shadowRadius="20"
+        android:textStyle="bold"
+        android:layout_centerInParent="true"
+        android:textSize="@dimen/standardMargin4x"
+        android:textColor="@color/purpleMain"
+        android:text="EX MUSIC"/>
+
+    <TextView
+        android:id="@+id/textRights"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_alignParentBottom="true"
+        android:textSize="13dp"
+        android:layout_marginBottom="@dimen/standardMargin6x"
+        android:textColor="@color/light_black2"
+        android:alpha="0.8"
+        android:text="Designed By Ex Group"/>
+
+</RelativeLayout>

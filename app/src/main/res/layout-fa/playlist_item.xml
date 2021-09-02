@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="160dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:cardCornerRadius="@dimen/standardMargin"
+    app:cardElevation="@dimen/standardMargin0.5x"
+    android:layout_margin="@dimen/standardMargin"
+    android:backgroundTint="?colorOnPrimary"
+    android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="160dp"
+        android:orientation="vertical"
+        android:foreground="?attr/selectableItemBackground"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/img1"
+                android:layout_width="80dp"
+                android:layout_height="80dp"/>
+            <ImageView
+                android:id="@+id/img2"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_toEndOf="@id/img1"
+                />
+            <ImageView
+                android:id="@+id/img3"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_below="@id/img1"
+                />
+            <ImageView
+                android:id="@+id/img4"
+                android:layout_width="80dp"
+                android:layout_toEndOf="@id/img3"
+                android:layout_below="@id/img2"
+                android:layout_height="80dp"
+                />
+        </RelativeLayout>
+
+        <com.dust.exmusic.customviews.CTextView
+            android:id="@+id/playListName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/standardMargin0.5x"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textSize="@dimen/standardMargin1.5x"
+            android:textColor="?android:textColor"
+            tools:text="playList1"/>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

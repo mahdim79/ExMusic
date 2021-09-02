@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="?colorPrimary"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedMain"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:descendantFocusability="blocksDescendants"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="@dimen/standardMargin6x"
+            android:descendantFocusability="blocksDescendants"
+            android:orientation="vertical">
+            <androidx.appcompat.widget.Toolbar
+                android:layout_width="match_parent"
+                android:background="?colorPrimary"
+                android:paddingTop="@dimen/standardMargin2x"
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:id="@+id/backImg"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:padding="14dp"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:src="@drawable/ic_baseline_arrow_back"
+                    />
+
+                <com.dust.exmusic.customviews.CTextView
+                    android:id="@+id/title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/playList"
+                    android:textSize="@dimen/standardMargin2x"
+                    android:layout_gravity="end"
+                    android:textDirection="ltr"
+                    android:textColor="?android:textColor"
+                    android:textStyle="bold"
+                    android:layout_marginHorizontal="@dimen/standardMargin1.5x"
+                    />
+            </androidx.appcompat.widget.Toolbar>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_marginTop="@dimen/standardMargin"
+                android:layout_height="wrap_content">
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/mainRecyclerView"
+                    android:scrollbars="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+                <LinearLayout
+                    android:id="@+id/nothing_Linear"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/standardMargin2x"
+                        android:src="@drawable/empty_music_list"/>
+
+                    <com.dust.exmusic.customviews.CTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/thereIsNothingHere"
+                        android:textSize="@dimen/standardMargin1.5x"
+                        android:gravity="center"
+                        android:layout_marginTop="@dimen/standardMargin"
+                        android:textColor="@color/purpleMain"/>
+                </LinearLayout>
+
+            </RelativeLayout>
+            <ImageView
+                android:id="@+id/addPlayList"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginVertical="@dimen/standardMargin0.5x"
+                android:visibility="gone"
+                android:layout_marginTop="@dimen/standardMargin4x"
+                android:src="@drawable/ic_baseline_add_24"
+                android:foreground="?attr/selectableItemBackground"
+                app:tint="@color/green"/>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/floatingButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:backgroundTint="@color/purpleMain"
+        android:layout_marginEnd="@dimen/standardMargin4x"
+        android:layout_marginBottom="@dimen/standardMargin8x"
+        android:visibility="gone"
+        app:tint="@color/white"
+        app:borderWidth="0dp"
+        android:src="@drawable/ic_baseline_add_24"
+        app:fabSize="normal"
+        />
+
+    <com.leinardi.android.speeddial.SpeedDialView
+        android:id="@+id/speedDial"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="@dimen/standardMargin2x"
+        android:layout_marginBottom="@dimen/standardMargin6x"
+        app:sdMainFabClosedBackgroundColor="@color/purpleMain"
+        app:sdMainFabOpenedBackgroundColor="@color/purple_200"
+        android:visibility="gone"
+        app:sdMainFabClosedIconColor="@color/white"
+        app:sdMainFabOpenedIconColor="@color/white"
+        app:sdMainFabClosedSrc="@drawable/ic_baseline_edit_24"/>
+
+</FrameLayout>

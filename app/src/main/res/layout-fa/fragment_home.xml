@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView android:id="@+id/nestedMain"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:descendantFocusability="blocksDescendants"
+    android:background="?colorPrimary"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:descendantFocusability="blocksDescendants"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="@dimen/standardMargin6x"
+            android:orientation="horizontal">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:elevation="@dimen/standardMargin2x"
+                android:backgroundTint="?colorOnPrimary"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="@dimen/standardMargin"
+                android:layout_marginVertical="2dp"
+                app:cardCornerRadius="18dp">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <Spinner
+                        android:id="@+id/sortSpinner"
+                        android:layout_width="wrap_content"
+                        android:layoutDirection="ltr"
+                        android:popupBackground="?colorOnPrimary"
+                        android:backgroundTint="?android:textColor"
+                        android:layout_height="match_parent"/>
+                    <ImageView
+                        android:id="@+id/imageSort"
+                        android:layout_width="@dimen/standardMargin2x"
+                        android:layout_marginEnd="@dimen/standardMargin"
+                        android:layout_marginStart="@dimen/standardMargin0.5x"
+                        android:src="@drawable/ic_baseline_sort_24"
+                        app:tint="@color/purpleMain"
+                        android:layout_height="match_parent"/>
+
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:textSize="15dp"
+                android:layout_alignParentStart="true"
+                android:gravity="center_vertical"
+                android:textStyle="bold"
+                android:layout_marginHorizontal="@dimen/standardMargin"
+                android:textColor="@color/purpleMain"
+                android:text="@string/allMusics"/>
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/mainRecyclerView"
+                android:layout_marginBottom="@dimen/standardMargin6x"
+                android:scrollbars="vertical"
+                android:layout_width="match_parent"
+                android:layout_marginTop="@dimen/standardMargin0.5x"
+                android:layout_height="match_parent"/>
+            <LinearLayout
+                android:id="@+id/nothing_Linear"
+                android:layout_width="match_parent"
+                android:visibility="gone"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/standardMargin2x"
+                    android:src="@drawable/empty_music_list"/>
+
+                <com.dust.exmusic.customviews.CTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/thereIsNothingHere"
+                    android:textSize="@dimen/standardMargin1.5x"
+                    android:gravity="center"
+                    android:layout_marginTop="@dimen/standardMargin"
+                    android:textColor="@color/purpleMain"/>
+            </LinearLayout>
+
+        </RelativeLayout>
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="match_parent"
+            android:indeterminateTint="@color/purpleMain"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

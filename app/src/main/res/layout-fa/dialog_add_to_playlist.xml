@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="250dp"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:background="?colorPrimary"
+    android:layout_height="wrap_content">
+    <com.dust.exmusic.customviews.CTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/addToPlayList"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:textColor="?android:textColor"
+        android:padding="@dimen/standardMargin"
+        android:textSize="18dp"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/blue"/>
+    <Spinner
+        android:id="@+id/playListSpinner"
+        android:layout_width="match_parent"
+        android:backgroundTint="?android:textColor"
+        android:layout_height="wrap_content"
+        android:popupBackground="?colorOnPrimary"
+        android:layout_marginHorizontal="@dimen/standardMargin"
+        android:layout_marginVertical="@dimen/standardMargin"/>
+
+    <com.dust.exmusic.customviews.CButton
+        android:id="@+id/submitButton"
+        android:layout_width="150dp"
+        android:text="@string/confirm"
+        android:textColor="@color/white"
+        android:layout_marginVertical="@dimen/standardMargin0.5x"
+        android:background="@drawable/confirm_button_selector"
+        android:layout_marginHorizontal="@dimen/standardMargin0.5x"
+        android:layout_height="40dp"/>
+
+</LinearLayout>

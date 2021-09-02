@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:gravity="center_horizontal"
+    android:background="?colorOnPrimary"
+    android:orientation="vertical"
+    android:fitsSystemWindows="false"
+    android:layout_height="match_parent">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="100dp"
+        android:layout_height="5dp"
+        app:cardCornerRadius="2dp"
+        android:layout_marginTop="@dimen/standardMargin0.5x"
+        android:backgroundTint="?android:textColor"
+        />
+
+    <com.dust.exmusic.customviews.CTextView
+        android:id="@+id/shareSong"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginBottom="@dimen/standardMargin0.5x"
+        android:paddingVertical="@dimen/standardMargin2x"
+        android:textSize="@dimen/standardMargin1.5x"
+        android:foreground="?selectableItemBackground"
+        android:layout_marginTop="@dimen/standardMargin2x"
+        android:textColor="?android:textColor"
+        android:textStyle="bold"
+        android:text="@string/share"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/light_black"/>
+
+    <com.dust.exmusic.customviews.CTextView
+        android:id="@+id/addToPlayList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingVertical="@dimen/standardMargin2x"
+        android:textSize="@dimen/standardMargin1.5x"
+        android:foreground="?selectableItemBackground"
+        android:layout_marginVertical="@dimen/standardMargin0.5x"
+        android:gravity="center"
+        android:textColor="?android:textColor"
+        android:textStyle="bold"
+        android:text="@string/addToPlayList"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/light_black"/>
+
+    <com.dust.exmusic.customviews.CTextView
+        android:id="@+id/details"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:foreground="?selectableItemBackground"
+        android:paddingVertical="@dimen/standardMargin2x"
+        android:layout_marginBottom="@dimen/standardMargin"
+        android:layout_marginTop="@dimen/standardMargin0.5x"
+        android:gravity="center"
+        android:textSize="@dimen/standardMargin1.5x"
+        android:textColor="?android:textColor"
+        android:textStyle="bold"
+        android:text="@string/details"/>
+
+</LinearLayout>

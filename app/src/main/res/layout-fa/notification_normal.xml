@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="70dp"
+    android:layoutDirection="ltr"
+    android:background="@color/notificationBackground"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/musicName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textDirection="ltr"
+        android:textStyle="bold"
+        android:focusableInTouchMode="true"
+        android:focusable="true"
+        android:textSize="@dimen/standardMargin1.5x"
+        android:ellipsize="marquee"
+        android:textColor="@color/white"
+        android:layout_toEndOf="@+id/mainImage"
+        android:layout_marginTop="@dimen/standardMargin"
+        android:layout_marginHorizontal="@dimen/standardMargin"/>
+
+    <TextView
+        android:id="@+id/artistName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="marquee"
+        android:focusableInTouchMode="true"
+        android:focusable="true"
+        android:textDirection="ltr"
+        android:layout_below="@+id/musicName"
+        android:textSize="12dp"
+        android:textColor="@color/light_black"
+        android:layout_toEndOf="@+id/mainImage"
+        android:layout_marginTop="@dimen/standardMargin0.5x"
+        android:layout_marginHorizontal="@dimen/standardMargin"/>
+    <ImageView
+        android:id="@+id/mainImage"
+        android:layout_width="70dp"
+        android:layout_height="match_parent"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
+        android:src="@drawable/avatar"/>
+
+</RelativeLayout>
