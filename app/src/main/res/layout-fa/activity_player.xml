@@ -26,7 +26,7 @@
             android:layout_height="0dp"
             android:layout_weight="75">
 
-            <com.gauravk.audiovisualizer.visualizer.CircleLineVisualizer
+            <com.gauravk.audiovisualizer.visualizer.BlastVisualizer
                 android:id="@+id/visualizer"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

@@ -126,7 +126,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
                             dialog1.dismiss();
                         } else {
                             dialog1.dismiss();
-                            getActivity().recreate();
+                            requireActivity().recreate();
                         }
                     }
                 });

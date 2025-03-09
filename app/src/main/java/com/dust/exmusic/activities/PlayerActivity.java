@@ -32,7 +32,7 @@ import com.dust.exmusic.interfaces.OnLoadPicture;
 import com.dust.exmusic.realm.RealmHandler;
 import com.dust.exmusic.services.PlayerService;
 import com.dust.exmusic.sharedpreferences.SharedPreferencesCenter;
-import com.gauravk.audiovisualizer.visualizer.CircleLineVisualizer;
+import com.gauravk.audiovisualizer.visualizer.BlastVisualizer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +56,7 @@ public class PlayerActivity extends AppCompatActivity {
     private ImageView othersImage;
     private ImageView addToFavImage;
     private ImageView shuffleButton;
-    private CircleLineVisualizer circleLineVisualizer;
+    private BlastVisualizer circleLineVisualizer;
 
     private boolean firstEntry = true;
 
@@ -372,7 +372,7 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     private void setUpViews() {
-        circleLineVisualizer = (CircleLineVisualizer) findViewById(R.id.visualizer);
+        circleLineVisualizer = (BlastVisualizer) findViewById(R.id.visualizer);
         playPauseButton = (ImageView) findViewById(R.id.playPauseButton);
         playerViewPager = (ViewPager) findViewById(R.id.playerViewPager);
         fastRewindButton = (ImageView) findViewById(R.id.fastRewindButton);
