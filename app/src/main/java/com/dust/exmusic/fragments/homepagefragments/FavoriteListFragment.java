@@ -1,9 +1,12 @@
 package com.dust.exmusic.fragments.homepagefragments;
 
+import static android.content.Context.RECEIVER_NOT_EXPORTED;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -128,7 +131,11 @@ public class FavoriteListFragment extends Fragment {
     public void onStart() {
         super.onStart();
         onFavoriteListChanged = new OnFavoriteListChanged();
-        getActivity().registerReceiver(onFavoriteListChanged, new IntentFilter("com.dust.exmusic.OnFavoriteListChanged"));
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+           getActivity().registerReceiver(onFavoriteListChanged, new IntentFilter("com.dust.exmusic.OnFavoriteListChanged"),RECEIVER_NOT_EXPORTED);
+        else
+            getActivity().registerReceiver(onFavoriteListChanged, new IntentFilter("com.dust.exmusic.OnFavoriteListChanged"));
     }
 
     @Override

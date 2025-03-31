@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -569,8 +570,17 @@ public class PlayerActivity extends AppCompatActivity {
         super.onStart();
         onMusicPlayerStateChanged = new OnMusicPlayerStateChanged();
         onDataSynced = new OnDataSynced();
-        registerReceiver(onMusicPlayerStateChanged, new IntentFilter("com.dust.exmusic.OnMusicPlayerStateChanged"));
-        registerReceiver(onDataSynced, new IntentFilter("com.dust.exmusic.OnDataSynced"));
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+            registerReceiver(onMusicPlayerStateChanged, new IntentFilter("com.dust.exmusic.OnMusicPlayerStateChanged"),RECEIVER_NOT_EXPORTED);
+        else
+            registerReceiver(onMusicPlayerStateChanged, new IntentFilter("com.dust.exmusic.OnMusicPlayerStateChanged"));
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+            registerReceiver(onDataSynced, new IntentFilter("com.dust.exmusic.OnDataSynced"),RECEIVER_NOT_EXPORTED);
+        else
+            registerReceiver(onDataSynced, new IntentFilter("com.dust.exmusic.OnDataSynced"));
+
         if (timer != null) {
             timer = new Timer();
             timer.schedule(new MainTimerTask(), 0, 500);

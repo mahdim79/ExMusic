@@ -1,9 +1,12 @@
 package com.dust.exmusic.fragments.navigationviewfragments.others;
 
+import static android.content.Context.RECEIVER_NOT_EXPORTED;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -185,11 +188,22 @@ public class SinglePlayListFragment extends Fragment {
         getActivity().sendBroadcast(intent);
 
         onItemLongClick = new OnItemLongClick();
-        getActivity().registerReceiver(onItemLongClick, new IntentFilter("com.dust.exmusic.OnItemLongClick"));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+            getActivity().registerReceiver(onItemLongClick, new IntentFilter("com.dust.exmusic.OnItemLongClick"),RECEIVER_NOT_EXPORTED);
+        }else {
+            getActivity().registerReceiver(onItemLongClick, new IntentFilter("com.dust.exmusic.OnItemLongClick"));
+        }
         onPlayListChanged = new OnPlayListChanged();
         onReceivePath = new OnReceivePath();
-        getActivity().registerReceiver(onPlayListChanged, new IntentFilter("com.dust.exmusic.OnPlayListChanged"));
-        getActivity().registerReceiver(onReceivePath, new IntentFilter("com.dust.exmusic.OnReceivePath"));
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+            getActivity().registerReceiver(onPlayListChanged, new IntentFilter("com.dust.exmusic.OnPlayListChanged"),RECEIVER_NOT_EXPORTED);
+            getActivity().registerReceiver(onReceivePath, new IntentFilter("com.dust.exmusic.OnReceivePath"),RECEIVER_NOT_EXPORTED);
+        }else {
+            getActivity().registerReceiver(onPlayListChanged, new IntentFilter("com.dust.exmusic.OnPlayListChanged"));
+            getActivity().registerReceiver(onReceivePath, new IntentFilter("com.dust.exmusic.OnReceivePath"));
+        }
+
     }
 
     @Override
@@ -366,7 +380,7 @@ public class SinglePlayListFragment extends Fragment {
     }
 
     private void sendPlayListDataChangedBroadCast() {
-        getActivity().sendBroadcast(new Intent("com.dust.exmusic.OnPlayListChanged"));
+        requireContext().sendBroadcast(new Intent("com.dust.exmusic.OnPlayListChanged"));
     }
 }
 

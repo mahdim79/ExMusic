@@ -9,8 +9,12 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.provider.Settings;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
@@ -19,6 +23,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContract;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -52,6 +61,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.Locale;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private DrawerLayout drawerLayout;
@@ -89,6 +99,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private int allDataCount = 0;
     private int favDataCount = 0;
+
+    private ActivityResultLauncher<String[]> externalStorageLauncher = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), new ActivityResultCallback<Map<String, Boolean>>() {
+        @Override
+        public void onActivityResult(Map<String, Boolean> result) {
+            checkPermissions();
+        }
+    });
+
+    private ActivityResultLauncher<String> externalRecordAudio = registerForActivityResult(new ActivityResultContracts.RequestPermission(), new ActivityResultCallback<Boolean>() {
+        @Override
+        public void onActivityResult(Boolean result) {}
+    });
+
+    private ActivityResultLauncher<Intent> externalStorageLauncherS = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+        @Override
+        public void onActivityResult(ActivityResult result) {
+            checkPermissions();
+        }
+    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -226,11 +255,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void checkPermissions() {
-        if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
-            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 101);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
+            if (!Environment.isExternalStorageManager()){
+                Intent permissionIntent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                permissionIntent.setData(Uri.fromParts("package", getPackageName(), null));
+                externalStorageLauncherS.launch(permissionIntent);
+                return;
+            }
+        }else {
+            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                externalStorageLauncher.launch(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE});
+                return;
+            }
+        }
 
         if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED)
-            requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, 102);
+            externalRecordAudio.launch(Manifest.permission.RECORD_AUDIO);
 
     }
 
@@ -378,9 +418,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         onUnlockDrawer = new OnUnlockDrawer();
         onReceivePath = new OnReceivePath();
         onFavoriteListChanged = new OnFavoriteListChanged();
-        registerReceiver(onFavoriteListChanged, new IntentFilter("com.dust.exmusic.OnFavoriteListChanged"));
-        registerReceiver(onUnlockDrawer, new IntentFilter("com.dust.exmusic.UNLOCK_MAIN_DRAWER"));
-        registerReceiver(onReceivePath, new IntentFilter("com.dust.exmusic.OnReceivePath"));
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+            registerReceiver(onFavoriteListChanged, new IntentFilter("com.dust.exmusic.OnFavoriteListChanged"),RECEIVER_NOT_EXPORTED);
+            registerReceiver(onUnlockDrawer, new IntentFilter("com.dust.exmusic.UNLOCK_MAIN_DRAWER"),RECEIVER_NOT_EXPORTED);
+            registerReceiver(onReceivePath, new IntentFilter("com.dust.exmusic.OnReceivePath"),RECEIVER_NOT_EXPORTED);
+        }else {
+            registerReceiver(onFavoriteListChanged, new IntentFilter("com.dust.exmusic.OnFavoriteListChanged"));
+            registerReceiver(onUnlockDrawer, new IntentFilter("com.dust.exmusic.UNLOCK_MAIN_DRAWER"));
+            registerReceiver(onReceivePath, new IntentFilter("com.dust.exmusic.OnReceivePath"));
+        }
+
         setUpSmallCircle();
         sendBroadcast(new Intent("com.dust.exmusic.OnFavoriteListChanged"));
     }

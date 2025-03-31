@@ -5,9 +5,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.dust.exmusic.interfaces.OnLoadPicture;
 import com.dust.exmusic.realm.ExternalRealmHandler;
+
+import java.io.File;
+import java.io.FileInputStream;
 
 import io.realm.Realm;
 
@@ -22,9 +26,9 @@ public class MetaDataLoader {
     private final int SMALL_PIC_SIZE = 0;
 
     public MetaDataLoader(String path) {
-        MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
-        mediaMetadataRetriever.setDataSource(path);
-        this.mediaMetadataRetriever = mediaMetadataRetriever;
+            MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
+            mediaMetadataRetriever.setDataSource(path);
+            this.mediaMetadataRetriever = mediaMetadataRetriever;
 
     }
 

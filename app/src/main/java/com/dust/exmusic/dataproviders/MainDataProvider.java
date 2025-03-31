@@ -32,7 +32,7 @@ public class MainDataProvider {
                         list.add(new Pair<>(listFiles[i].getPath(), listFiles[i].lastModified()));
                     }
                 } else {
-                    if (rootPath.equals(Environment.getExternalStorageDirectory().toString())) {
+                    if (rootPath.equals(Environment.getExternalStorageDirectory().getAbsolutePath())) {
                         if (!listFiles[i].getName().equals("Android")
                                 && !listFiles[i].getName().equals("Telegram"))
                             list.addAll(getMainRawData(listFiles[i].getAbsolutePath()));
@@ -54,43 +54,47 @@ public class MainDataProvider {
         protected List<MainDataClass> doInBackground(Void... voids) {
             List<MainDataClass> list = new ArrayList<>();
 
-            List<Pair<String, Long>> map = getMainRawData(Environment.getExternalStorageDirectory() + "");
+            List<Pair<String, Long>> map = getMainRawData(Environment.getExternalStorageDirectory().getAbsolutePath());
             for (int i = 0; i < map.size(); i++) {
-                String result = map.get(i).first;
-                MainDataClass dataClass = new MainDataClass();
-                MetaDataLoader metaDataLoader = new MetaDataLoader(result);
-                String name = metaDataLoader.getName();
-                if (name == null || name.equals(""))
-                    dataClass.setMusicName(result.substring(result.lastIndexOf("/"), result.length()));
-                else
-                    dataClass.setMusicName(name);
+                try{
+                    String result = map.get(i).first;
+                    MainDataClass dataClass = new MainDataClass();
+                    MetaDataLoader metaDataLoader = new MetaDataLoader(result);
+                    String name = metaDataLoader.getName();
+                    if (name == null || name.equals(""))
+                        dataClass.setMusicName(result.substring(result.lastIndexOf("/"), result.length()));
+                    else
+                        dataClass.setMusicName(name);
 
-                String artistName = metaDataLoader.getArtistName();
+                    String artistName = metaDataLoader.getArtistName();
 
-                if (artistName == null || artistName.equals(""))
-                    dataClass.setArtistName("ناشناس");
-                else
-                    dataClass.setArtistName(artistName);
+                    if (artistName == null || artistName.equals(""))
+                        dataClass.setArtistName("ناشناس");
+                    else
+                        dataClass.setArtistName(artistName);
 
-                String year = metaDataLoader.getYear();
+                    String year = metaDataLoader.getYear();
 
-                if (year == null || year.equals(""))
-                    dataClass.setYear("نامشخص");
-                else
-                    dataClass.setYear(year);
+                    if (year == null || year.equals(""))
+                        dataClass.setYear("نامشخص");
+                    else
+                        dataClass.setYear(year);
 
-                String album = metaDataLoader.getAlbum();
+                    String album = metaDataLoader.getAlbum();
 
-                if (album == null || album.equals(""))
-                    dataClass.setAlbum("نامشخص");
-                else
-                    dataClass.setAlbum(album);
+                    if (album == null || album.equals(""))
+                        dataClass.setAlbum("نامشخص");
+                    else
+                        dataClass.setAlbum(album);
 
-                dataClass.setLastModification(map.get(i).second);
+                    dataClass.setLastModification(map.get(i).second);
 
-                dataClass.setPath(result);
-                dataClass.setPlaying(true);
-                list.add(dataClass);
+                    dataClass.setPath(result);
+                    dataClass.setPlaying(true);
+                    list.add(dataClass);
+                }catch (Exception e){
+                    Log.i("loadSongLog","exception: " + e.getMessage());
+                }
             }
             return list;
         }

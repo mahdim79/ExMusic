@@ -1,13 +1,22 @@
 package com.dust.exmusic.services;
 
+import static android.app.Notification.FOREGROUND_SERVICE_IMMEDIATE;
+import static android.app.Notification.PRIORITY_DEFAULT;
+import static android.app.Notification.PRIORITY_MIN;
+
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.util.Pair;
 import android.widget.RemoteViews;
@@ -353,6 +362,19 @@ public class PlayerService extends Service {
         sendBroadcast(intent1);
     }
 
+    private String createNotificationChannel(){
+        String channelId = getPackageName();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            NotificationChannel channel = new NotificationChannel(channelId,"music_channel", NotificationManager.IMPORTANCE_MIN);
+            channel.setLightColor(Color.BLUE);
+            channel.setVibrationPattern(new long[0]);
+            channel.enableVibration(false);
+            channel.setSound(null, null);
+            ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
+        }
+        return channelId;
+    }
+
     private void showNotification(int type) {
         Intent mainIntent = new Intent(this, PlayerActivity.class);
         mainIntent.putExtra("PATH", path);
@@ -386,29 +408,31 @@ public class PlayerService extends Service {
                     icon = R.drawable.gradient_play;
                 }
 
-                Notification notification = new NotificationCompat.Builder(PlayerService.this)
+                Notification notification = new NotificationCompat.Builder(PlayerService.this,createNotificationChannel())
                         .setSmallIcon(R.drawable.playlist)
                         .setLargeIcon(bitmap)
-                        .setContentTitle(getMusicDataByPath(path).getMusicName())
-                        .setContentText(getMusicDataByPath(path).getArtistName())
+                        .setForegroundServiceBehavior(FOREGROUND_SERVICE_IMMEDIATE)
+                        .setSound(null)
+                        .setContentTitle("")
+                        .setPriority(PRIORITY_MIN)
+                        .setContentText("")
                         .setCustomContentView(new RemoteViews(getPackageName(), R.layout.notification_normal))
                         .setCustomBigContentView(new RemoteViews(getPackageName(), R.layout.notification_layout))
-                        .setContentIntent(PendingIntent.getActivity(PlayerService.this, 102, mainIntent, PendingIntent.FLAG_UPDATE_CURRENT))
+                        .setContentIntent(PendingIntent.getActivity(PlayerService.this, 102, mainIntent, PendingIntent.FLAG_IMMUTABLE))
                         .build();
 
                 notification.contentView.setImageViewBitmap(R.id.mainImage, bitmap);
                 notification.contentView.setTextViewText(R.id.musicName, getMusicDataByPath(path).getMusicName());
                 notification.contentView.setTextViewText(R.id.artistName, getMusicDataByPath(path).getArtistName());
 
-                notification.bigContentView.setOnClickPendingIntent(R.id.close, PendingIntent.getService(PlayerService.this, 101, intent1, 0));
+                notification.bigContentView.setOnClickPendingIntent(R.id.close, PendingIntent.getService(PlayerService.this, 101, intent1, PendingIntent.FLAG_IMMUTABLE));
                 notification.bigContentView.setImageViewBitmap(R.id.mainImage, bitmap);
                 notification.bigContentView.setImageViewResource(R.id.play, icon);
                 notification.bigContentView.setTextViewText(R.id.musicName, getMusicDataByPath(path).getMusicName());
                 notification.bigContentView.setTextViewText(R.id.artistName, getMusicDataByPath(path).getArtistName());
-                notification.bigContentView.setOnClickPendingIntent(R.id.rewind, PendingIntent.getService(PlayerService.this, 103, intentRewind, 0));
-                notification.bigContentView.setOnClickPendingIntent(R.id.play, PendingIntent.getService(PlayerService.this, 103, intentPlay, 0));
-                notification.bigContentView.setOnClickPendingIntent(R.id.forward, PendingIntent.getService(PlayerService.this, 103, intentForward, 0));
-
+                notification.bigContentView.setOnClickPendingIntent(R.id.rewind, PendingIntent.getService(PlayerService.this, 103, intentRewind, PendingIntent.FLAG_IMMUTABLE));
+                notification.bigContentView.setOnClickPendingIntent(R.id.play, PendingIntent.getService(PlayerService.this, 103, intentPlay, PendingIntent.FLAG_IMMUTABLE));
+                notification.bigContentView.setOnClickPendingIntent(R.id.forward, PendingIntent.getService(PlayerService.this, 103, intentForward, PendingIntent.FLAG_IMMUTABLE));
                 startForeground(101, notification);
 
             }
