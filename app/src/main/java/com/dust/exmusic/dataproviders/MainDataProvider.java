@@ -48,13 +48,42 @@ public class MainDataProvider {
         return list;
     }
 
+    private List<Pair<String,Long>> filterDuplicateData(List<Pair<String,Long>> data){
+        List<Pair<String,Long>> filteredData = new ArrayList<>();
+
+        for (int i = 0;i<data.size();i++){
+            String path = data.get(i).first;
+            if (path.contains("(") && path.contains(")") && (path.indexOf(")") - path.indexOf("(") == 2)){
+                try{
+                    String num = path.substring(path.indexOf("(") +1 ,path.indexOf(")"));
+                    int a = Integer.parseInt(num);
+                    String testPath = path.substring(0,path.lastIndexOf("("));
+                    boolean found = false;
+                    for (int j = 0;j<filteredData.size();j++){
+                        if (filteredData.get(j).first.contains(testPath)){
+                            found = true;
+                        }
+                    }
+                    if (!found){
+                        filteredData.add(data.get(i));
+                    }
+                }catch (Exception e){
+                    filteredData.add(data.get(i));
+                }
+            }else {
+                filteredData.add(data.get(i));
+            }
+        }
+        return filteredData;
+    }
+
     private class GetMainDataAsync extends AsyncTask<Void, Void, List<MainDataClass>> {
 
         @Override
         protected List<MainDataClass> doInBackground(Void... voids) {
             List<MainDataClass> list = new ArrayList<>();
 
-            List<Pair<String, Long>> map = getMainRawData(Environment.getExternalStorageDirectory().getAbsolutePath());
+            List<Pair<String, Long>> map = filterDuplicateData(getMainRawData(Environment.getExternalStorageDirectory().getAbsolutePath()));
             for (int i = 0; i < map.size(); i++) {
                 try{
                     String result = map.get(i).first;

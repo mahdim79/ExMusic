@@ -283,7 +283,7 @@ public class WholePlayListFragment extends Fragment {
     }
 
     private void sendPlayListDataChangedBroadCast() {
-        getActivity().sendBroadcast(new Intent("com.dust.exmusic.OnPlayListChanged"));
+        requireContext().sendBroadcast(new Intent("com.dust.exmusic.OnPlayListChanged"));
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.dust.exmusic.adapters.recyclerviews;
 
-import static android.content.Context.RECEIVER_NOT_EXPORTED;
+import static android.content.Context.RECEIVER_EXPORTED;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -143,7 +143,7 @@ public class AllMusicsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
             }
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-            context.registerReceiver(new OnReceivePath(), new IntentFilter("com.dust.exmusic.OnReceivePath"),RECEIVER_NOT_EXPORTED);
+            context.registerReceiver(new OnReceivePath(), new IntentFilter("com.dust.exmusic.OnReceivePath"),RECEIVER_EXPORTED);
         else
             context.registerReceiver(new OnReceivePath(), new IntentFilter("com.dust.exmusic.OnReceivePath"));
 
@@ -162,7 +162,7 @@ public class AllMusicsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
             }
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-            context.registerReceiver(new OnFavoriteListChanged(), new IntentFilter("com.dust.exmusic.OnFavoriteListChanged"),RECEIVER_NOT_EXPORTED);
+            context.registerReceiver(new OnFavoriteListChanged(), new IntentFilter("com.dust.exmusic.OnFavoriteListChanged"),RECEIVER_EXPORTED);
         else
             context.registerReceiver(new OnFavoriteListChanged(), new IntentFilter("com.dust.exmusic.OnFavoriteListChanged"));
 

@@ -28,8 +28,11 @@
 
             <com.gauravk.audiovisualizer.visualizer.BlastVisualizer
                 android:id="@+id/visualizer"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="290dp"
+                android:layout_height="290dp"
+                android:alpha="0.8"
+                android:layout_centerInParent="true"
+                android:padding="25dp"
                 app:avDensity="0.7"
                 app:avColor="@color/purpleMain"/>
 

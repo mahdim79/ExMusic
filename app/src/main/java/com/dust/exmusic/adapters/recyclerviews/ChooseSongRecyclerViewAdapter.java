@@ -1,6 +1,6 @@
 package com.dust.exmusic.adapters.recyclerviews;
 
-import static android.content.Context.RECEIVER_NOT_EXPORTED;
+import static android.content.Context.RECEIVER_EXPORTED;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -103,7 +103,7 @@ public class ChooseSongRecyclerViewAdapter extends RecyclerView.Adapter<ChooseSo
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-            context.registerReceiver(new OnUnSelectOrder(), new IntentFilter("com.dust.exmusic.OnUnSelectOrder"),RECEIVER_NOT_EXPORTED);
+            context.registerReceiver(new OnUnSelectOrder(), new IntentFilter("com.dust.exmusic.OnUnSelectOrder"),RECEIVER_EXPORTED);
         else
             context.registerReceiver(new OnUnSelectOrder(), new IntentFilter("com.dust.exmusic.OnUnSelectOrder"));
 

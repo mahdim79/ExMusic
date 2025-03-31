@@ -1,6 +1,6 @@
 package com.dust.exmusic.fragments.navigationviewfragments.main;
 
-import static android.content.Context.RECEIVER_NOT_EXPORTED;
+import static android.content.Context.RECEIVER_EXPORTED;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -237,12 +237,12 @@ public class WholeFavoriteListFragment extends Fragment {
 
         onItemLongClick = new OnItemLongClick();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-            getActivity().registerReceiver(onItemLongClick, new IntentFilter("com.dust.exmusic.OnItemLongClick"), RECEIVER_NOT_EXPORTED);
+            getActivity().registerReceiver(onItemLongClick, new IntentFilter("com.dust.exmusic.OnItemLongClick"), RECEIVER_EXPORTED);
         else
             getActivity().registerReceiver(onItemLongClick, new IntentFilter("com.dust.exmusic.OnItemLongClick"));
         onFavoriteListChanged = new OnFavoriteListChanged();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-            getActivity().registerReceiver(onFavoriteListChanged, new IntentFilter("com.dust.exmusic.OnFavoriteListChanged"), RECEIVER_NOT_EXPORTED);
+            getActivity().registerReceiver(onFavoriteListChanged, new IntentFilter("com.dust.exmusic.OnFavoriteListChanged"), RECEIVER_EXPORTED);
         else
             getActivity().registerReceiver(onFavoriteListChanged, new IntentFilter("com.dust.exmusic.OnFavoriteListChanged"));
     }

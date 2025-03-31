@@ -1,6 +1,6 @@
 package com.dust.exmusic.fragments.navigationviewfragments.others;
 
-import static android.content.Context.RECEIVER_NOT_EXPORTED;
+import static android.content.Context.RECEIVER_EXPORTED;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -189,7 +189,7 @@ public class SinglePlayListFragment extends Fragment {
 
         onItemLongClick = new OnItemLongClick();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
-            getActivity().registerReceiver(onItemLongClick, new IntentFilter("com.dust.exmusic.OnItemLongClick"),RECEIVER_NOT_EXPORTED);
+            getActivity().registerReceiver(onItemLongClick, new IntentFilter("com.dust.exmusic.OnItemLongClick"),RECEIVER_EXPORTED);
         }else {
             getActivity().registerReceiver(onItemLongClick, new IntentFilter("com.dust.exmusic.OnItemLongClick"));
         }
@@ -197,8 +197,8 @@ public class SinglePlayListFragment extends Fragment {
         onReceivePath = new OnReceivePath();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
-            getActivity().registerReceiver(onPlayListChanged, new IntentFilter("com.dust.exmusic.OnPlayListChanged"),RECEIVER_NOT_EXPORTED);
-            getActivity().registerReceiver(onReceivePath, new IntentFilter("com.dust.exmusic.OnReceivePath"),RECEIVER_NOT_EXPORTED);
+            getActivity().registerReceiver(onPlayListChanged, new IntentFilter("com.dust.exmusic.OnPlayListChanged"),RECEIVER_EXPORTED);
+            getActivity().registerReceiver(onReceivePath, new IntentFilter("com.dust.exmusic.OnReceivePath"),RECEIVER_EXPORTED);
         }else {
             getActivity().registerReceiver(onPlayListChanged, new IntentFilter("com.dust.exmusic.OnPlayListChanged"));
             getActivity().registerReceiver(onReceivePath, new IntentFilter("com.dust.exmusic.OnReceivePath"));

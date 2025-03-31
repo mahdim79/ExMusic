@@ -1,6 +1,6 @@
 package com.dust.exmusic.fragments.homepagefragments;
 
-import static android.content.Context.RECEIVER_NOT_EXPORTED;
+import static android.content.Context.RECEIVER_EXPORTED;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -131,7 +131,7 @@ public class PlayListFragment extends Fragment {
         super.onStart();
         onPlayListChanged = new OnPlayListChanged();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-            getActivity().registerReceiver(onPlayListChanged, new IntentFilter("com.dust.exmusic.OnPlayListChanged"),RECEIVER_NOT_EXPORTED);
+            getActivity().registerReceiver(onPlayListChanged, new IntentFilter("com.dust.exmusic.OnPlayListChanged"),RECEIVER_EXPORTED);
         else
             getActivity().registerReceiver(onPlayListChanged, new IntentFilter("com.dust.exmusic.OnPlayListChanged"));
     }
@@ -140,6 +140,11 @@ public class PlayListFragment extends Fragment {
     public void onStop() {
         getActivity().unregisterReceiver(onPlayListChanged);
         super.onStop();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
     }
 
     private class OnPlayListChanged extends BroadcastReceiver {

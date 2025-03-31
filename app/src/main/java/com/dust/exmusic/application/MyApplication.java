@@ -1,7 +1,10 @@
 package com.dust.exmusic.application;
 
 import android.app.Application;
+import android.content.res.Configuration;
 import android.graphics.Typeface;
+import android.util.DisplayMetrics;
+import android.view.WindowManager;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;

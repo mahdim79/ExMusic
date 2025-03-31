@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.Settings;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
@@ -72,7 +73,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TabLayout tableLayout;
     private AppBarLayout appbarLayout;
     private ImageView imgSearch;
-    private ImageView headerImage;
     private ImageView circle_center;
     private CardView cardView1;
     private CTextView version;
@@ -124,16 +124,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         seExTheme();
         setUpEnglishLanguage();
         super.onCreate(savedInstanceState);
+        adjustFontScale();
         setContentView(R.layout.activity_main);
         checkPermissions();
         setUpSharedPreferences();
         setUpRealmHandler();
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         setUpViews();
-        setUpHeaderImage();
         setUpSearchImg();
         setPrimaryImportantData();
         setUpFloatingActionButton();
+        new Handler(getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        },2000);
+    }
+
+    private void adjustFontScale() {
+        Configuration configuration = getResources().getConfiguration();
+        if (configuration.fontScale != 1.0f) {
+            configuration.fontScale = 1.0f;
+            DisplayMetrics metrics = getResources().getDisplayMetrics();
+            WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
+            wm.getDefaultDisplay().getMetrics(metrics);
+            metrics.scaledDensity = configuration.fontScale * metrics.density;
+            getBaseContext().getResources().updateConfiguration(configuration, metrics);
+        }
     }
 
     private void setUpEnglishLanguage() {
@@ -229,12 +247,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         sharedPreferencesCenter = new SharedPreferencesCenter(this);
     }
 
-    private void setUpHeaderImage() {
-
-        headerImage.setImageResource(R.drawable.bg_one);
-
-    }
-
     private boolean checkServiceRunning() {
         ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo runningServiceInfo : activityManager.getRunningServices(Integer.MAX_VALUE)) {
@@ -279,7 +291,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         version = (CTextView) findViewById(R.id.version);
         floatingButton = (FloatingActionButton) findViewById(R.id.floatingButton);
         appbarLayout = (AppBarLayout) findViewById(R.id.appbarLayout);
-        headerImage = (ImageView) findViewById(R.id.headerImage);
         imgSearch = (ImageView) findViewById(R.id.imgSearch);
         circle_center = (ImageView) findViewById(R.id.circle_center);
         drawer = (LinearLayout) findViewById(R.id.drawer);
@@ -420,9 +431,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         onFavoriteListChanged = new OnFavoriteListChanged();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
-            registerReceiver(onFavoriteListChanged, new IntentFilter("com.dust.exmusic.OnFavoriteListChanged"),RECEIVER_NOT_EXPORTED);
-            registerReceiver(onUnlockDrawer, new IntentFilter("com.dust.exmusic.UNLOCK_MAIN_DRAWER"),RECEIVER_NOT_EXPORTED);
-            registerReceiver(onReceivePath, new IntentFilter("com.dust.exmusic.OnReceivePath"),RECEIVER_NOT_EXPORTED);
+            registerReceiver(onFavoriteListChanged, new IntentFilter("com.dust.exmusic.OnFavoriteListChanged"),RECEIVER_EXPORTED);
+            registerReceiver(onUnlockDrawer, new IntentFilter("com.dust.exmusic.UNLOCK_MAIN_DRAWER"),RECEIVER_EXPORTED);
+            registerReceiver(onReceivePath, new IntentFilter("com.dust.exmusic.OnReceivePath"),RECEIVER_EXPORTED);
         }else {
             registerReceiver(onFavoriteListChanged, new IntentFilter("com.dust.exmusic.OnFavoriteListChanged"));
             registerReceiver(onUnlockDrawer, new IntentFilter("com.dust.exmusic.UNLOCK_MAIN_DRAWER"));
@@ -462,11 +473,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void onGetPicture(Bitmap bitmap) {
                     if (bitmap != null) {
-                        headerImage.setImageBitmap(bitmap);
                         circle_center.setImageBitmap(bitmap);
                     } else {
                         circle_center.setImageResource(R.drawable.empty_music_pic);
-                        headerImage.setImageResource(R.drawable.empty_music_pic);
                     }
                 }
             });
@@ -480,12 +489,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     startActivity(intent1);
                 }
             });
-            headerImage.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    cardView1.performClick();
-                }
-            });
+
         }
     }
 

@@ -35,5 +35,6 @@
     <color name="primaryDarkVariant">#30324A</color>
     <color name="purpleMain">#B656C6</color>
     <color name="fullTransparent">#00FAFAFA</color>
+    <color name="ic_launcher_background">#242c34</color>
 
 </resources>

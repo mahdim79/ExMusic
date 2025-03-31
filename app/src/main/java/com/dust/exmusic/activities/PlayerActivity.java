@@ -6,12 +6,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.util.DisplayMetrics;
 import android.util.Pair;
 import android.view.View;
 import android.view.WindowManager;
@@ -94,6 +96,7 @@ public class PlayerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         seExTheme();
         super.onCreate(savedInstanceState);
+        adjustFontScale();
         setContentView(R.layout.activity_player);
         setUpDataBase();
         setUpSharedPreferences();
@@ -106,6 +109,18 @@ public class PlayerActivity extends AppCompatActivity {
         setUpService(getIntent().getExtras().getString("PATH"));
         setUpAddToFavoriteImage(getIntent().getExtras().getString("PATH"));
         setUpShuffleButton();
+    }
+
+    private void adjustFontScale() {
+        Configuration configuration = getResources().getConfiguration();
+        if (configuration.fontScale != 1.0f) {
+            configuration.fontScale = 1.0f;
+            DisplayMetrics metrics = getResources().getDisplayMetrics();
+            WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
+            wm.getDefaultDisplay().getMetrics(metrics);
+            metrics.scaledDensity = configuration.fontScale * metrics.density;
+            getBaseContext().getResources().updateConfiguration(configuration, metrics);
+        }
     }
 
     private void seExTheme() {
@@ -572,12 +587,12 @@ public class PlayerActivity extends AppCompatActivity {
         onDataSynced = new OnDataSynced();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-            registerReceiver(onMusicPlayerStateChanged, new IntentFilter("com.dust.exmusic.OnMusicPlayerStateChanged"),RECEIVER_NOT_EXPORTED);
+            registerReceiver(onMusicPlayerStateChanged, new IntentFilter("com.dust.exmusic.OnMusicPlayerStateChanged"),RECEIVER_EXPORTED);
         else
             registerReceiver(onMusicPlayerStateChanged, new IntentFilter("com.dust.exmusic.OnMusicPlayerStateChanged"));
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-            registerReceiver(onDataSynced, new IntentFilter("com.dust.exmusic.OnDataSynced"),RECEIVER_NOT_EXPORTED);
+            registerReceiver(onDataSynced, new IntentFilter("com.dust.exmusic.OnDataSynced"),RECEIVER_EXPORTED);
         else
             registerReceiver(onDataSynced, new IntentFilter("com.dust.exmusic.OnDataSynced"));
 
