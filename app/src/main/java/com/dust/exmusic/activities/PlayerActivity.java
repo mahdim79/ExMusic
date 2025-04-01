@@ -366,7 +366,7 @@ public class PlayerActivity extends AppCompatActivity {
                 PlayerActivity.this.mediaPlayer = playerService.mediaPlayer;
                 setUpVisualizer(mediaPlayer.getAudioSessionId());
                 setUpMediaController();
-                if (mediaPlayer.getCurrentPosition() > 0) {
+                if (mediaPlayer.getCurrentPosition() >= 0) {
                     totalTime.setText(calculateTimer(mediaPlayer.getDuration()));
                     if (mediaPlayer.isPlaying()) {
                         playPauseButton.setImageResource(R.drawable.gradient_pause);

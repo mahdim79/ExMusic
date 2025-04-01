@@ -24,6 +24,7 @@ import android.widget.RemoteViews;
 import androidx.core.app.NotificationCompat;
 
 import com.dust.exmusic.R;
+import com.dust.exmusic.activities.MainActivity;
 import com.dust.exmusic.activities.PlayerActivity;
 import com.dust.exmusic.dataclasses.MainDataClass;
 import com.dust.exmusic.dataproviders.MetaDataLoader;
@@ -186,10 +187,9 @@ public class PlayerService extends Service {
                         } else {
                             RepeatMode = sharedPreferencesCenter.getRepeatMode();
                             if (RepeatMode == REPEAT_ONE) {
-                                mediaPlayer.seekTo(0);
-                                mediaPlayer.start();
+                                initMediaPlayer(path, false);
                             } else if (RepeatMode == REPEAT_OFF) {
-                                mediaPlayer.seekTo(0);
+                                initMediaPlayer(path, true);
                                 showNotification(TYPE_PAUSE);
                             } else {
                                 setRepeat();
@@ -376,11 +376,7 @@ public class PlayerService extends Service {
     }
 
     private void showNotification(int type) {
-        Intent mainIntent = new Intent(this, PlayerActivity.class);
-        mainIntent.putExtra("PATH", path);
-        mainIntent.setAction("asdf");
-        mainIntent.putExtra("SERVICE_EXTRA", true);
-
+        Intent mainIntent = new Intent(this, MainActivity.class);
         mainIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         Intent intentPlay = new Intent(this, PlayerService.class);

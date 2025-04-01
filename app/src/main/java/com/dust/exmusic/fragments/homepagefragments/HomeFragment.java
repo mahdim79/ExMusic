@@ -1,9 +1,16 @@
 package com.dust.exmusic.fragments.homepagefragments;
 
+import android.Manifest;
 import android.app.ActivityManager;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +25,10 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.widget.NestedScrollView;
@@ -37,6 +48,7 @@ import com.dust.exmusic.sharedpreferences.SharedPreferencesCenter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static android.content.Context.ACTIVITY_SERVICE;
 
@@ -61,6 +73,31 @@ public class HomeFragment extends Fragment {
 
     private int SortType = SORT_BY_LAST_MODIFICATION_DATE;
 
+    private ActivityResultLauncher<String[]> externalStorageLauncher = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), new ActivityResultCallback<Map<String, Boolean>>() {
+        @Override
+        public void onActivityResult(Map<String, Boolean> result) {
+            checkPermissions();
+        }
+    });
+
+    private ActivityResultLauncher<String> externalRecordAudio = registerForActivityResult(new ActivityResultContracts.RequestPermission(), new ActivityResultCallback<Boolean>() {
+        @Override
+        public void onActivityResult(Boolean result) {
+            checkPermissions();
+        }
+    });
+
+    private ActivityResultLauncher<String> postNotificationLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), new ActivityResultCallback<Boolean>() {
+        @Override
+        public void onActivityResult(Boolean result) {}
+    });
+
+    private ActivityResultLauncher<Intent> externalStorageLauncherS = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+        @Override
+        public void onActivityResult(ActivityResult result) {
+            checkPermissions();
+        }
+    });
 
     @Nullable
     @Override
@@ -75,9 +112,13 @@ public class HomeFragment extends Fragment {
         setUpSharedPreferences();
         setUpAlphaAnimation();
         setUpDataBase();
-        setUpRecyclerView();
-        setUpPagination();
-        setUpSortSpinner();
+        checkPermissions();
+    }
+
+    @Override
+    public void onResume() {
+        Log.i("HomeFragment","onResume");
+        super.onResume();
     }
 
     private void setUpSortSpinner() {
@@ -118,11 +159,11 @@ public class HomeFragment extends Fragment {
 
     private void setUpAlphaAnimation() {
         AlphaAnimation alphaAnimation = new AlphaAnimation(0f, 1f);
-        alphaAnimation.setDuration(1000);
+        alphaAnimation.setDuration(500);
         alphaAnimation.setFillAfter(true);
 
         ScaleAnimation scaleAnimation = new ScaleAnimation(0f, 1f, 0f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-        scaleAnimation.setDuration(1000);
+        scaleAnimation.setDuration(500);
 
         set.addAnimation(alphaAnimation);
         set.addAnimation(scaleAnimation);
@@ -182,11 +223,47 @@ public class HomeFragment extends Fragment {
         }
     }
 
+    private void checkPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
+            if (!Environment.isExternalStorageManager()){
+                Intent permissionIntent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                permissionIntent.setData(Uri.fromParts("package", requireContext().getPackageName(), null));
+                externalStorageLauncherS.launch(permissionIntent);
+                return;
+            }
+        }else {
+            if (requireContext().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || requireContext().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                externalStorageLauncher.launch(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE});
+                return;
+            }
+        }
+
+        initMusicListOptions();
+
+        if (requireContext().checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED){
+            externalRecordAudio.launch(Manifest.permission.RECORD_AUDIO);
+            return;
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (requireContext().checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED){
+                postNotificationLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+            }
+        }
+
+    }
+
+    private void initMusicListOptions() {
+        setUpRecyclerView();
+        setUpPagination();
+        setUpSortSpinner();
+    }
+
     private void setUpRecyclerView() {
         List<MainDataClass> currentList = dbHandler.getMainData(pagination, sharedPreferencesCenter.getSortType());
         if (!currentList.isEmpty()) {
             totalList.addAll(currentList);
-            mAdapter = new AllMusicsRecyclerViewAdapter(totalList, getActivity(), getActivity().getSupportFragmentManager(), set, sharedPreferencesCenter, "ALL|ALL");
+            mAdapter = new AllMusicsRecyclerViewAdapter(totalList, requireContext(), getActivity().getSupportFragmentManager(), set, sharedPreferencesCenter, "ALL|ALL");
             recyclerView.setAdapter(mAdapter);
             progressBar.setVisibility(View.GONE);
             sendPath();
@@ -227,6 +304,8 @@ public class HomeFragment extends Fragment {
                                     getActivity().sendBroadcast(new Intent("com.dust.exmusic.OnFolderListChanged"));
 
                                     sendPath();
+
+                                    startSorting(SORT_BY_NAME);
                                 } catch (Exception e) {
                                 }
                             }

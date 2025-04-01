@@ -228,7 +228,7 @@
                       app:layout_constraintStart_toStartOf="parent"
                       app:layout_constraintEnd_toEndOf="parent"
                       android:layout_marginTop="@dimen/standardMargin3x"
-                      android:layoutDirection="rtl"
+                      android:layoutDirection="ltr"
                       android:layout_height="?attr/actionBarSize">
                       <RelativeLayout
                           android:layout_width="match_parent"

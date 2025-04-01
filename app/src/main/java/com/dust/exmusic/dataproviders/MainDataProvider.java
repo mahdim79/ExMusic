@@ -57,7 +57,7 @@ public class MainDataProvider {
                 try{
                     String num = path.substring(path.indexOf("(") +1 ,path.indexOf(")"));
                     int a = Integer.parseInt(num);
-                    String testPath = path.substring(0,path.lastIndexOf("("));
+                    String testPath = path.substring(0,path.lastIndexOf("(")).trim();
                     boolean found = false;
                     for (int j = 0;j<filteredData.size();j++){
                         if (filteredData.get(j).first.contains(testPath)){

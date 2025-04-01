@@ -100,24 +100,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int allDataCount = 0;
     private int favDataCount = 0;
 
-    private ActivityResultLauncher<String[]> externalStorageLauncher = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), new ActivityResultCallback<Map<String, Boolean>>() {
-        @Override
-        public void onActivityResult(Map<String, Boolean> result) {
-            checkPermissions();
-        }
-    });
-
-    private ActivityResultLauncher<String> externalRecordAudio = registerForActivityResult(new ActivityResultContracts.RequestPermission(), new ActivityResultCallback<Boolean>() {
-        @Override
-        public void onActivityResult(Boolean result) {}
-    });
-
-    private ActivityResultLauncher<Intent> externalStorageLauncherS = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
-        @Override
-        public void onActivityResult(ActivityResult result) {
-            checkPermissions();
-        }
-    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,7 +108,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         adjustFontScale();
         setContentView(R.layout.activity_main);
-        checkPermissions();
         setUpSharedPreferences();
         setUpRealmHandler();
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
@@ -264,26 +245,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else {
             cardView1.setVisibility(View.GONE);
         }
-    }
-
-    private void checkPermissions() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
-            if (!Environment.isExternalStorageManager()){
-                Intent permissionIntent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
-                permissionIntent.setData(Uri.fromParts("package", getPackageName(), null));
-                externalStorageLauncherS.launch(permissionIntent);
-                return;
-            }
-        }else {
-            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-                externalStorageLauncher.launch(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE});
-                return;
-            }
-        }
-
-        if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED)
-            externalRecordAudio.launch(Manifest.permission.RECORD_AUDIO);
-
     }
 
     private void setUpViews() {

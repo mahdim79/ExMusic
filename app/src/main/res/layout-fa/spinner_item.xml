@@ -5,6 +5,7 @@
     android:padding="@dimen/standardMargin"
     android:background="?colorOnPrimary"
     tools:text="item1"
+    android:textSize="12sp"
     android:foreground="?selectableItemBackground"
     android:gravity="center"
     android:textColor="?android:textColor"
