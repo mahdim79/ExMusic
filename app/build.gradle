@@ -15,6 +15,8 @@ android {
         versionName "1.0"
         vectorDrawables.useSupportLibrary = true
 
+        renderscriptTargetApi = 24
+        renderscriptSupportModeEnabled = true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -41,6 +43,7 @@ dependencies {
     implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation 'com.android.support:swiperefreshlayout:27.1.1'
     implementation 'com.leinardi.android:speed-dial:3.2.0'
+    implementation 'at.favre.lib:dali:0.4.0'
     implementation 'com.jakewharton:disklrucache:2.0.2'
     implementation(files("libs/audiovisualizer.aar"))
     testImplementation 'junit:junit:4.+'

@@ -12,9 +12,7 @@
         android:id="@+id/transparentImage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/empty_music_pic"
-        android:scaleType="centerCrop"
-        android:alpha="0.3"/>
+        android:scaleType="centerCrop"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -51,6 +49,7 @@
                     android:layout_gravity="center"
                     android:textSize="@dimen/standardMargin2x"
                     android:textStyle="bold"
+                    android:textColor="@color/black_normal"
                     tools:text="00:22"/>
 
             </androidx.cardview.widget.CardView>

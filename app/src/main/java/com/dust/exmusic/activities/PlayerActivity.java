@@ -35,6 +35,7 @@ import com.dust.exmusic.interfaces.OnLoadPicture;
 import com.dust.exmusic.realm.RealmHandler;
 import com.dust.exmusic.services.PlayerService;
 import com.dust.exmusic.sharedpreferences.SharedPreferencesCenter;
+import com.gauravk.audiovisualizer.visualizer.BarVisualizer;
 import com.gauravk.audiovisualizer.visualizer.BlastVisualizer;
 
 import java.util.ArrayList;
@@ -42,6 +43,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import at.favre.lib.dali.Dali;
 
 public class PlayerActivity extends AppCompatActivity {
 
@@ -59,7 +62,7 @@ public class PlayerActivity extends AppCompatActivity {
     private ImageView othersImage;
     private ImageView addToFavImage;
     private ImageView shuffleButton;
-    private BlastVisualizer circleLineVisualizer;
+    private BlastVisualizer blastVisualizer;
 
     private boolean firstEntry = true;
 
@@ -80,8 +83,7 @@ public class PlayerActivity extends AppCompatActivity {
 
     List<MainDataClass> list = new ArrayList<>();
 
-    private final int ShuffleModeOn = 1;
-    private final int ShuffleModeOff = 0;
+    private int blurRadius = 17;
 
     private final int REPEAT_OFF = 0;
     private final int REPEAT_ON = 1;
@@ -316,9 +318,9 @@ public class PlayerActivity extends AppCompatActivity {
                             @Override
                             public void onGetPicture(Bitmap bitmap) {
                                 if (bitmap != null)
-                                    transparentImage.setImageBitmap(bitmap);
+                                    Dali.create(PlayerActivity.this).load(bitmap).blurRadius(blurRadius).into(transparentImage);
                                 else
-                                    transparentImage.setImageResource(R.drawable.empty_music_pic);
+                                    Dali.create(PlayerActivity.this).load(R.drawable.empty_music_pic).blurRadius(blurRadius).into(transparentImage);
                                 transparentImage.startAnimation(alphaAnimation);
 
                             }
@@ -388,7 +390,7 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     private void setUpViews() {
-        circleLineVisualizer = (BlastVisualizer) findViewById(R.id.visualizer);
+        blastVisualizer = (BlastVisualizer) findViewById(R.id.visualizer);
         playPauseButton = (ImageView) findViewById(R.id.playPauseButton);
         playerViewPager = (ViewPager) findViewById(R.id.playerViewPager);
         fastRewindButton = (ImageView) findViewById(R.id.fastRewindButton);
@@ -410,8 +412,7 @@ public class PlayerActivity extends AppCompatActivity {
             @Override
             public void onGetPicture(Bitmap bitmap) {
                 if (bitmap != null) {
-                    transparentImage.setImageBitmap(bitmap);
-
+                    Dali.create(PlayerActivity.this).load(bitmap).blurRadius(blurRadius).into(transparentImage);
                 }
             }
         });
@@ -702,8 +703,8 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     private void releaseVisualizer() {
-        if (circleLineVisualizer != null)
-            circleLineVisualizer.release();
+        if (blastVisualizer != null)
+            blastVisualizer.release();
     }
 
     private void setUpVisualizer(int sessionId) {
@@ -711,7 +712,7 @@ public class PlayerActivity extends AppCompatActivity {
             @Override
             public void run() {
                 if (sessionId != -1)
-                    circleLineVisualizer.setAudioSessionId(sessionId);
+                    blastVisualizer.setAudioSessionId(sessionId);
             }
         }, 200);
     }
