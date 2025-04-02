@@ -407,6 +407,7 @@ public class PlayerActivity extends AppCompatActivity {
         shuffleButton = (ImageView) findViewById(R.id.shuffleButton);
 
         musicSeekbar.setEnabled(false);
+        Dali.create(PlayerActivity.this).load(R.drawable.empty_music_pic).blurRadius(blurRadius).into(transparentImage);
 
         new MetaDataLoader(PlayerActivity.this).getPicture(getIntent().getExtras().getString("PATH"), new OnLoadPicture() {
             @Override
@@ -452,18 +453,26 @@ public class PlayerActivity extends AppCompatActivity {
         fastForwardButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(PlayerActivity.this, PlayerService.class);
+                /*Intent intent = new Intent(PlayerActivity.this, PlayerService.class);
                 intent.setAction("com.dust.exmusic.ACTION_FORWARD");
-                startService(intent);
+                startService(intent);*/
+                try {
+                    int currentItem = playerViewPager.getCurrentItem() + 1;
+                    playerViewPager.setCurrentItem(currentItem,true);
+                }catch (Exception e){}
             }
         });
 
         fastRewindButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(PlayerActivity.this, PlayerService.class);
+                /*Intent intent = new Intent(PlayerActivity.this, PlayerService.class);
                 intent.setAction("com.dust.exmusic.ACTION_REWIND");
-                startService(intent);
+                startService(intent);*/
+                try {
+                    int currentItem = playerViewPager.getCurrentItem() - 1;
+                    playerViewPager.setCurrentItem(currentItem,true);
+                }catch (Exception e){}
             }
         });
 
@@ -690,9 +699,7 @@ public class PlayerActivity extends AppCompatActivity {
                 } else {
                     playPauseButton.setImageResource(R.drawable.gradient_play);
                 }
-            } catch (Exception e) {
-
-            }
+            } catch (Exception e) {}
         }
     }
 
