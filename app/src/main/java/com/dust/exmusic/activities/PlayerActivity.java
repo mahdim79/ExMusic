@@ -116,6 +116,30 @@ public class PlayerActivity extends AppCompatActivity {
         setUpShuffleButton();
     }
 
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        Context myContext = newBase;
+
+        try {
+            String localeStr;
+            if (new SharedPreferencesCenter(this).getEnglishLanguage())
+                localeStr = "en";
+            else
+                localeStr = "fa";
+            Locale locale = new Locale(localeStr);
+            Locale.setDefault(locale);
+
+            Configuration configuration = newBase.getResources().getConfiguration();
+            configuration.setLayoutDirection(new Locale(localeStr));
+            configuration.setLocale(locale);
+            Context newContext = newBase.createConfigurationContext(configuration);
+            if (newContext != null)
+                myContext = newContext;
+        }catch (Exception e){}
+        super.attachBaseContext(myContext);
+    }
+
+
     private void adjustFontScale() {
         Configuration configuration = getResources().getConfiguration();
         if (configuration.fontScale != 1.0f) {
@@ -243,12 +267,14 @@ public class PlayerActivity extends AppCompatActivity {
 
         } else if (getIntent().getExtras().containsKey("SHUFFLE_MODE")) {
             sharedPreferencesCenter.setPlayPair(getIntent().getExtras().getString("PLAY_LIST"));
+            sharedPreferencesCenter.setLastPlayMode(getIntent().getExtras().getString("PLAY_LIST"));
             setUpListByShuffle();
 
         } else {
 
             if (getIntent().getExtras().containsKey("PLAY_LIST")) {
                 sharedPreferencesCenter.setPlayPair(getIntent().getExtras().getString("PLAY_LIST"));
+                sharedPreferencesCenter.setLastPlayMode(getIntent().getExtras().getString("PLAY_LIST"));
                 setUpListByType(getIntent().getExtras().getString("PLAY_LIST"));
             }
 

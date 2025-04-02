@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
@@ -104,7 +105,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         seExTheme();
-        setUpEnglishLanguage();
         super.onCreate(savedInstanceState);
         adjustFontScale();
         setContentView(R.layout.activity_main);
@@ -135,17 +135,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void setUpEnglishLanguage() {
-        String localeStr;
-        if (new SharedPreferencesCenter(this).getEnglishLanguage())
-            localeStr = "en";
-        else
-            localeStr = "fa";
-        Locale locale = new Locale(localeStr);
-        Locale.setDefault(locale);
-        Configuration config = getResources().getConfiguration();
-        config.setLocale(locale);
-        getResources().updateConfiguration(config, getResources().getDisplayMetrics());
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        Context myContext = newBase;
+
+        try {
+            String localeStr;
+            if (new SharedPreferencesCenter(myContext).getEnglishLanguage())
+                localeStr = "en";
+            else
+                localeStr = "fa";
+            Locale locale = new Locale(localeStr);
+            Locale.setDefault(locale);
+
+            Configuration configuration = newBase.getResources().getConfiguration();
+            configuration.setLayoutDirection(new Locale(localeStr));
+            configuration.setLocale(locale);
+            Context newContext = newBase.createConfigurationContext(configuration);
+            if (newContext != null)
+               myContext = newContext;
+        }catch (Exception e){}
+        super.attachBaseContext(myContext);
     }
 
     private void seExTheme() {
@@ -197,16 +207,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 sharedPreferencesCenter.setPlaylistActive("");
                 Intent intent = new Intent(MainActivity.this, PlayerActivity.class);
                 if (viewPager.getCurrentItem() == 0) {
+                    sharedPreferencesCenter.setLastPlayMode(getJoinedShuffleMode("ALL", "ALL"));
                     sharedPreferencesCenter.setShuffleMode(getJoinedShuffleMode("ALL", "ALL"));
                     intent.putExtra("PATH", handler.getMainData(1, sharedPreferencesCenter.getSortType()).get(0).getPath());
                     intent.putExtra("SHUFFLE_MODE", "ALL");
                     intent.putExtra("PLAY_LIST", "ALL|ALL");
                 } else {
+                    sharedPreferencesCenter.setLastPlayMode(getJoinedShuffleMode("FavoriteList", "FavoriteList"));
                     sharedPreferencesCenter.setShuffleMode(getJoinedShuffleMode("FavoriteList", "FavoriteList"));
                     intent.putExtra("PATH", handler.getMusicDataByPath(sharedPreferencesCenter.getFavoriteListPaths()[0]).getPath());
                     intent.putExtra("PLAY_LIST", "FavoriteList|FavoriteList");
                 }
                 startActivity(intent);
+                throw new RuntimeException("test exception");
             }
         });
     }

@@ -15,7 +15,6 @@ import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
@@ -35,7 +34,6 @@ import com.dust.exmusic.realm.MainObject;
 import com.dust.exmusic.sharedpreferences.SharedPreferencesCenter;
 
 import java.io.IOException;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -83,7 +81,7 @@ public class PlayerService extends Service {
                 if (lastNotificationType != TYPE_PAUSE)
                     showNotification(lastNotificationType);
             }
-        },0,200);
+        }, 0, 200);
         mediaSessionCompat = new MediaSessionCompat(this, "media_session_main");
         mediaSessionCompat.setCallback(new MediaSessionCompat.Callback() {
             @Override
@@ -100,7 +98,8 @@ public class PlayerService extends Service {
                     Intent intentPlay = new Intent(PlayerService.this, PlayerService.class);
                     intentPlay.setAction("com.dust.exmusic.ACTION_PLAY");
                     PendingIntent.getService(PlayerService.this, 103, intentPlay, PendingIntent.FLAG_IMMUTABLE).send();
-                } catch (Exception e) {}
+                } catch (Exception e) {
+                }
             }
 
             @Override
@@ -110,7 +109,8 @@ public class PlayerService extends Service {
                     Intent intentPlay = new Intent(PlayerService.this, PlayerService.class);
                     intentPlay.setAction("com.dust.exmusic.ACTION_PLAY");
                     PendingIntent.getService(PlayerService.this, 103, intentPlay, PendingIntent.FLAG_IMMUTABLE).send();
-                } catch (Exception e) {}
+                } catch (Exception e) {
+                }
             }
 
             @Override
@@ -127,38 +127,39 @@ public class PlayerService extends Service {
         });
     }
 
-    private void goToNextMusic(){
+    private void goToNextMusic() {
         String nextPath = getPreviousAndNextPath(path).second;
-        if (nextPath != null){
+        if (nextPath != null) {
             mediaPlayer.setOnCompletionListener(null);
             mediaPlayer.stop();
             mediaPlayer.release();
             mediaPlayer = null;
-            initMediaPlayer(nextPath,false);
+            initMediaPlayer(nextPath, false);
         }
     }
 
-    private void goToPrevMusic(){
+    private void goToPrevMusic() {
         String previousPath = getPreviousAndNextPath(path).first;
-        if (previousPath != null){
+        if (previousPath != null) {
             mediaPlayer.setOnCompletionListener(null);
             mediaPlayer.stop();
             mediaPlayer.release();
             mediaPlayer = null;
-            initMediaPlayer(previousPath,false);
+            initMediaPlayer(previousPath, false);
         }
     }
 
     private void initMediaPlayer(String path, boolean offMode) {
         this.path = path;
-        Log.i("initMediaPlayerFun","init");
+        Log.i("initMediaPlayerFun", "init");
         try {
-            try{
+            try {
                 mediaPlayer.setOnCompletionListener(null);
                 mediaPlayer.stop();
                 mediaPlayer.release();
                 mediaPlayer = null;
-            }catch (Exception e){}
+            } catch (Exception e) {
+            }
             mediaPlayer = new MediaPlayer();
             mediaPlayer.setLooping(false);
             mediaPlayer.setDataSource(path);
@@ -166,7 +167,7 @@ public class PlayerService extends Service {
                 @Override
                 public void onPrepared(MediaPlayer mediaPlayer) {
                     mediaPlayer.start();
-                    Log.i("initMediaPlayer","start()");
+                    Log.i("initMediaPlayer", "start()");
                     if (offMode) {
                         mediaPlayer.pause();
                         showNotification(TYPE_PAUSE);
@@ -181,13 +182,13 @@ public class PlayerService extends Service {
                 }
             });
 
-            Log.i("initMediaPlayerFun","setOnCompletionListener init");
+            Log.i("initMediaPlayerFun", "setOnCompletionListener init");
             mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mediaPlayer) {
 
-                    if (mediaPlayer.getDuration() > 0 && ((mediaPlayer.getCurrentPosition() / 1000) >= (mediaPlayer.getDuration() / 1000) || ((mediaPlayer.getCurrentPosition() + 1000) / 1000) == (mediaPlayer.getDuration() / 1000))){
-                        Log.i("initMediaPlayerFun","on completion call current = " + mediaPlayer.getCurrentPosition() + " | " + mediaPlayer.getDuration());
+                    if (mediaPlayer.getDuration() > 0 && ((mediaPlayer.getCurrentPosition() / 1000) >= (mediaPlayer.getDuration() / 1000) || ((mediaPlayer.getCurrentPosition() + 1000) / 1000) == (mediaPlayer.getDuration() / 1000))) {
+                        Log.i("initMediaPlayerFun", "on completion call current = " + mediaPlayer.getCurrentPosition() + " | " + mediaPlayer.getDuration());
 
                         Intent intent = new Intent("com.dust.exmusic.OnDataSynced");
                         intent.putExtra("COMPLETION", 1);
@@ -283,13 +284,13 @@ public class PlayerService extends Service {
                             } else {
                                 RepeatMode = sharedPreferencesCenter.getRepeatMode();
                                 if (RepeatMode == REPEAT_ONE) {
-                                    Log.i("initMediaPlayerFun","on completion call REPEAT_ONE");
+                                    Log.i("initMediaPlayerFun", "on completion call REPEAT_ONE");
                                     initMediaPlayer(path, false);
                                 } else if (RepeatMode == REPEAT_OFF) {
                                     initMediaPlayer(path, true);
                                     showNotification(TYPE_PAUSE);
                                 } else {
-                                    Log.i("initMediaPlayerFun","on completion call ELSE");
+                                    Log.i("initMediaPlayerFun", "on completion call ELSE");
                                     setRepeat();
                                 }
                             }
@@ -302,7 +303,7 @@ public class PlayerService extends Service {
             mediaPlayer.prepareAsync();
 
         } catch (IOException e) {
-            Log.i("initMediaPlayer",e.getMessage());
+            Log.i("initMediaPlayer", e.getMessage());
         }
     }
 
@@ -355,7 +356,7 @@ public class PlayerService extends Service {
     }
 
     private Pair<String, String> getSeparatedShuffleMode() {
-        String data = sharedPreferencesCenter.getShuffleMode();
+        String data = sharedPreferencesCenter.getLastPlayMode();
         return new Pair<>(data.substring(0, data.indexOf('|')), data.substring(data.indexOf('|') + 1));
     }
 
@@ -423,13 +424,13 @@ public class PlayerService extends Service {
             case "com.dust.exmusic.ACTION_FORWARD":
             case "com.dust.exmusic.ACTION_REWIND":
                 String nextPath = intent.getStringExtra("EXTRA_MUSIC_PATH");
-                if (nextPath != null){
+                if (nextPath != null) {
                     mediaPlayer.setOnCompletionListener(null);
                     mediaPlayer.stop();
                     mediaPlayer.release();
                     mediaPlayer = null;
-                    initMediaPlayer(nextPath,false);
-                    Log.i("ACTION_FORWARD",nextPath);
+                    initMediaPlayer(nextPath, false);
+                    Log.i("ACTION_FORWARD", nextPath);
                 }
                 break;
             case "com.dust.exmusic.ACTION_SEND_PATH":
@@ -462,10 +463,47 @@ public class PlayerService extends Service {
         return START_STICKY;
     }
 
-    private Pair<String,String> getPreviousAndNextPath(String currentPath){
-        List<MainDataClass> allMusics = externalRealmHandler.getAllSortedMainData(sharedPreferencesCenter.getSortType());
+    private List<MainDataClass> getListByType() {
+        externalRealmHandler.getAllSortedMainData(sharedPreferencesCenter.getSortType());
+
+        if (!sharedPreferencesCenter.getPlaylistActive().isEmpty()) {
+            return getPlayListData(sharedPreferencesCenter.getPlaylistActive());
+        } else {
+            List<MainDataClass> list = new ArrayList<>();
+            Pair<String, String> pair = getSeparatedShuffleMode();
+            switch (pair.first) {
+                case "Artists":
+                    list.addAll(externalRealmHandler.getArtistSongs(pair.second));
+                    break;
+                case "Albums":
+                    list.addAll(externalRealmHandler.getAlbumSongs(pair.second));
+                    break;
+                case "Folders":
+                    list.addAll(externalRealmHandler.getFoldersSong(pair.second));
+                    break;
+                case "ALL":
+                    list.addAll(externalRealmHandler.getAllSortedMainData(sharedPreferencesCenter.getSortType()));
+                    break;
+                case "PlayList":
+                    list.addAll(externalRealmHandler.getPlayListData(pair.second));
+                    break;
+                case "FavoriteList":
+                    String[] names = sharedPreferencesCenter.getFavoriteListPaths();
+                    if (!names[0].equals(""))
+                        for (int i = 0; i < names.length; i++)
+                            list.add(externalRealmHandler.getMusicDataByPath(names[i]));
+                    break;
+                default:
+                    return externalRealmHandler.getAllSortedMainData(sharedPreferencesCenter.getSortType());
+            }
+            return list;
+        }
+    }
+
+    private Pair<String, String> getPreviousAndNextPath(String currentPath) {
+        List<MainDataClass> allMusics = getListByType();
         int currentIndex = -1;
-        for (int i = 0; i < allMusics.size();i++){
+        for (int i = 0; i < allMusics.size(); i++) {
             if (allMusics.get(i).getPath().equals(currentPath))
                 currentIndex = i;
         }
@@ -482,7 +520,7 @@ public class PlayerService extends Service {
         if (nIndex < allMusics.size())
             nextPath = allMusics.get(nIndex).getPath();
 
-        return new Pair<String,String>(previousPath,nextPath);
+        return new Pair<String, String>(previousPath, nextPath);
     }
 
     private void sendPath() {
@@ -535,7 +573,7 @@ public class PlayerService extends Service {
                     icon = R.drawable.ic_baseline_play_arrow_white;
                 }
 
-                try{
+                try {
                     MediaMetadataCompat.Builder mediaMetadataCompat = new MediaMetadataCompat.Builder();
                     mediaMetadataCompat.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, mediaPlayer.getDuration());
                     mediaSessionCompat.setMetadata(mediaMetadataCompat.build());
@@ -548,7 +586,8 @@ public class PlayerService extends Service {
                             .setActions(PlaybackStateCompat.ACTION_SEEK_TO | PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_PAUSE | PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS);
 
                     mediaSessionCompat.setPlaybackState(pbs.build());
-                }catch (Exception e){}
+                } catch (Exception e) {
+                }
 
                 Notification notification = new NotificationCompat.Builder(PlayerService.this, createNotificationChannel())
                         .setSmallIcon(icon)
@@ -574,7 +613,7 @@ public class PlayerService extends Service {
 
     @Override
     public void onDestroy() {
-        if (notificationUpdaterTimer != null){
+        if (notificationUpdaterTimer != null) {
             notificationUpdaterTimer.purge();
             notificationUpdaterTimer.cancel();
         }

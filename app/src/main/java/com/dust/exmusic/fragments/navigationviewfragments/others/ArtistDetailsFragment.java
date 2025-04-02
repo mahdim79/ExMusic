@@ -77,6 +77,7 @@ public class ArtistDetailsFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 sharedPreferencesCenter.setPlaylistActive("");
+                sharedPreferencesCenter.setLastPlayMode(getJoinedShuffleMode("Artists", getArguments().getString("NAME")));
                 sharedPreferencesCenter.setShuffleMode(getJoinedShuffleMode("Artists", getArguments().getString("NAME")));
                 Intent intent = new Intent(getActivity(), PlayerActivity.class);
                 intent.putExtra("PATH", data.get(0).getPath());

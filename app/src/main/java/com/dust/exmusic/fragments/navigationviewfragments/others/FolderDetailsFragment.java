@@ -78,6 +78,7 @@ public class FolderDetailsFragment extends Fragment {
             public void onClick(View view) {
                 sharedPreferencesCenter.setPlaylistActive("");
                 sharedPreferencesCenter.setShuffleMode(getJoinedShuffleMode("Folders", getArguments().getString("NAME").substring(0, getArguments().getString("NAME").lastIndexOf("/"))));
+                sharedPreferencesCenter.setLastPlayMode(getJoinedShuffleMode("Folders", getArguments().getString("NAME").substring(0, getArguments().getString("NAME").lastIndexOf("/"))));
                 Intent intent = new Intent(getActivity(), PlayerActivity.class);
                 intent.putExtra("PATH", data.get(0).getPath());
                 intent.putExtra("SHUFFLE_MODE", "Folders");
