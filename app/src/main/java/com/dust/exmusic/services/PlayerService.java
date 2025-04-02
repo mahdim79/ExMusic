@@ -186,7 +186,7 @@ public class PlayerService extends Service {
                 @Override
                 public void onCompletion(MediaPlayer mediaPlayer) {
 
-                    if (mediaPlayer.getDuration() > 0 && ((mediaPlayer.getCurrentPosition() / 1000) == (mediaPlayer.getDuration() / 1000) || ((mediaPlayer.getCurrentPosition() + 1000) / 1000) == (mediaPlayer.getDuration() / 1000))){
+                    if (mediaPlayer.getDuration() > 0 && ((mediaPlayer.getCurrentPosition() / 1000) >= (mediaPlayer.getDuration() / 1000) || ((mediaPlayer.getCurrentPosition() + 1000) / 1000) == (mediaPlayer.getDuration() / 1000))){
                         Log.i("initMediaPlayerFun","on completion call current = " + mediaPlayer.getCurrentPosition() + " | " + mediaPlayer.getDuration());
 
                         Intent intent = new Intent("com.dust.exmusic.OnDataSynced");
