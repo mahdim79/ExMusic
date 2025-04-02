@@ -15,6 +15,7 @@ import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
@@ -79,7 +80,8 @@ public class PlayerService extends Service {
         notificationUpdaterTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                showNotification(lastNotificationType);
+                if (lastNotificationType != TYPE_PAUSE)
+                    showNotification(lastNotificationType);
             }
         },0,200);
         mediaSessionCompat = new MediaSessionCompat(this, "media_session_main");
@@ -114,31 +116,51 @@ public class PlayerService extends Service {
             @Override
             public void onSkipToNext() {
                 super.onSkipToNext();
-                try {
-                    Intent intentPlay = new Intent(PlayerService.this, PlayerService.class);
-                    intentPlay.setAction("com.dust.exmusic.ACTION_FORWARD");
-                    PendingIntent.getService(PlayerService.this, 103, intentPlay, PendingIntent.FLAG_IMMUTABLE).send();
-                } catch (Exception e) {}
+                goToNextMusic();
             }
 
             @Override
             public void onSkipToPrevious() {
                 super.onSkipToPrevious();
-                try {
-                    Intent intentPlay = new Intent(PlayerService.this, PlayerService.class);
-                    intentPlay.setAction("com.dust.exmusic.ACTION_REWIND");
-                    PendingIntent.getService(PlayerService.this, 103, intentPlay, PendingIntent.FLAG_IMMUTABLE).send();
-                } catch (Exception e) {}
+                goToPrevMusic();
             }
         });
+    }
+
+    private void goToNextMusic(){
+        String nextPath = getPreviousAndNextPath(path).second;
+        if (nextPath != null){
+            mediaPlayer.setOnCompletionListener(null);
+            mediaPlayer.stop();
+            mediaPlayer.release();
+            mediaPlayer = null;
+            initMediaPlayer(nextPath,false);
+        }
+    }
+
+    private void goToPrevMusic(){
+        String previousPath = getPreviousAndNextPath(path).first;
+        if (previousPath != null){
+            mediaPlayer.setOnCompletionListener(null);
+            mediaPlayer.stop();
+            mediaPlayer.release();
+            mediaPlayer = null;
+            initMediaPlayer(previousPath,false);
+        }
     }
 
     private void initMediaPlayer(String path, boolean offMode) {
         this.path = path;
         Log.i("initMediaPlayerFun","init");
-
-        mediaPlayer = new MediaPlayer();
         try {
+            try{
+                mediaPlayer.setOnCompletionListener(null);
+                mediaPlayer.stop();
+                mediaPlayer.release();
+                mediaPlayer = null;
+            }catch (Exception e){}
+            mediaPlayer = new MediaPlayer();
+            mediaPlayer.setLooping(false);
             mediaPlayer.setDataSource(path);
             mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
@@ -159,121 +181,125 @@ public class PlayerService extends Service {
                 }
             });
 
+            Log.i("initMediaPlayerFun","setOnCompletionListener init");
             mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mediaPlayer) {
 
-                    Intent intent = new Intent("com.dust.exmusic.OnDataSynced");
-                    intent.putExtra("COMPLETION", 1);
-                    sendBroadcast(intent);
+                    if (mediaPlayer.getDuration() > 0 && ((mediaPlayer.getCurrentPosition() / 1000) == (mediaPlayer.getDuration() / 1000) || ((mediaPlayer.getCurrentPosition() + 1000) / 1000) == (mediaPlayer.getDuration() / 1000))){
+                        Log.i("initMediaPlayerFun","on completion call current = " + mediaPlayer.getCurrentPosition() + " | " + mediaPlayer.getDuration());
 
-                    mediaPlayer.stop();
-                    mediaPlayer.release();
-                    if (!sharedPreferencesCenter.getPlaylistActive().equals("") && sharedPreferencesCenter.getShuffleMode().equals("")) {
-                        List<MainDataClass> datas = getPlayListData(sharedPreferencesCenter.getPlaylistActive());
-                        for (int i = 0; i < datas.size(); i++) {
-                            if (datas.get(i).getPath().equals(path)) {
+                        Intent intent = new Intent("com.dust.exmusic.OnDataSynced");
+                        intent.putExtra("COMPLETION", 1);
+                        sendBroadcast(intent);
 
-                                //      mediaPlayer.release();
-                                if (i == datas.size() - 1) {
-                                    switch (sharedPreferencesCenter.getRepeatMode()) {
-                                        case REPEAT_OFF:
-                                            initMediaPlayer(datas.get(0).getPath(), true);
-                                            PlayerService.this.path = datas.get(0).getPath();
-                                            break;
-                                        case REPEAT_ON:
-                                            initMediaPlayer(datas.get(0).getPath(), false);
-                                            PlayerService.this.path = datas.get(0).getPath();
-                                            break;
-                                        case REPEAT_ONE:
-                                            initMediaPlayer(datas.get(i).getPath(), false);
-                                            PlayerService.this.path = datas.get(i).getPath();
-                                            break;
+                        if (!sharedPreferencesCenter.getPlaylistActive().equals("") && sharedPreferencesCenter.getShuffleMode().equals("")) {
+                            List<MainDataClass> datas = getPlayListData(sharedPreferencesCenter.getPlaylistActive());
+                            for (int i = 0; i < datas.size(); i++) {
+                                if (datas.get(i).getPath().equals(path)) {
+
+                                    //      mediaPlayer.release();
+                                    if (i == datas.size() - 1) {
+                                        switch (sharedPreferencesCenter.getRepeatMode()) {
+                                            case REPEAT_OFF:
+                                                initMediaPlayer(datas.get(0).getPath(), true);
+                                                PlayerService.this.path = datas.get(0).getPath();
+                                                break;
+                                            case REPEAT_ON:
+                                                initMediaPlayer(datas.get(0).getPath(), false);
+                                                PlayerService.this.path = datas.get(0).getPath();
+                                                break;
+                                            case REPEAT_ONE:
+                                                initMediaPlayer(datas.get(i).getPath(), false);
+                                                PlayerService.this.path = datas.get(i).getPath();
+                                                break;
+                                        }
+                                    } else {
+                                        initMediaPlayer(datas.get(i + 1).getPath(), false);
+                                        PlayerService.this.path = datas.get(i + 1).getPath();
                                     }
+                                    stopForeground(true);
+                                }
+                            }
+                        } else {
+                            if (!sharedPreferencesCenter.getShuffleMode().equals("")) {
+                                List<MainDataClass> list = new ArrayList<>();
+                                Pair<String, String> pair = getSeparatedShuffleMode();
+                                switch (pair.first) {
+                                    case "Artists":
+                                        list.addAll(externalRealmHandler.getArtistSongs(pair.second));
+                                        break;
+                                    case "Albums":
+                                        list.addAll(externalRealmHandler.getAlbumSongs(pair.second));
+                                        break;
+                                    case "Folders":
+                                        list.addAll(externalRealmHandler.getFoldersSong(pair.second));
+                                        break;
+                                    case "ALL":
+                                        list.addAll(externalRealmHandler.getAllSortedMainData(sharedPreferencesCenter.getSortType()));
+                                        break;
+                                    case "PlayList":
+                                        list.addAll(externalRealmHandler.getPlayListData(pair.second));
+                                        break;
+                                    case "FavoriteList":
+                                        String[] names = sharedPreferencesCenter.getFavoriteListPaths();
+                                        if (!names[0].equals(""))
+                                            for (int i = 0; i < names.length; i++)
+                                                list.add(externalRealmHandler.getMusicDataByPath(names[i]));
+
+                                        break;
+                                }
+
+                                // mediaPlayer.release();
+                                int index = 0;
+
+                                switch (list.size()) {
+                                    case 1:
+                                        index = 0;
+                                        break;
+                                    case 2:
+                                        for (int i = 0; i < list.size(); i++) {
+                                            if (!list.get(i).getPath().equals(path))
+                                                index = i;
+                                        }
+                                        break;
+                                    default:
+                                        if (!list.isEmpty()) {
+                                            do {
+                                                index = getRandomNumber(0, list.size());
+                                            } while (list.get(index).getPath().equals(path));
+                                        }
+                                        break;
+                                }
+
+                                if (list.isEmpty()) {
+                                    sharedPreferencesCenter.setShuffleMode("");
+                                    initMediaPlayer(path, true);
                                 } else {
-                                    initMediaPlayer(datas.get(i + 1).getPath(), false);
-                                    PlayerService.this.path = datas.get(i + 1).getPath();
+                                    initMediaPlayer(list.get(index).getPath(), false);
+                                    PlayerService.this.path = list.get(index).getPath();
                                 }
                                 stopForeground(true);
-                            }
-                        }
-                    } else {
-                        if (!sharedPreferencesCenter.getShuffleMode().equals("")) {
-                            List<MainDataClass> list = new ArrayList<>();
-                            Pair<String, String> pair = getSeparatedShuffleMode();
-                            switch (pair.first) {
-                                case "Artists":
-                                    list.addAll(externalRealmHandler.getArtistSongs(pair.second));
-                                    break;
-                                case "Albums":
-                                    list.addAll(externalRealmHandler.getAlbumSongs(pair.second));
-                                    break;
-                                case "Folders":
-                                    list.addAll(externalRealmHandler.getFoldersSong(pair.second));
-                                    break;
-                                case "ALL":
-                                    list.addAll(externalRealmHandler.getAllSortedMainData(sharedPreferencesCenter.getSortType()));
-                                    break;
-                                case "PlayList":
-                                    list.addAll(externalRealmHandler.getPlayListData(pair.second));
-                                    break;
-                                case "FavoriteList":
-                                    String[] names = sharedPreferencesCenter.getFavoriteListPaths();
-                                    if (!names[0].equals(""))
-                                        for (int i = 0; i < names.length; i++)
-                                            list.add(externalRealmHandler.getMusicDataByPath(names[i]));
-
-                                    break;
-                            }
-
-                            // mediaPlayer.release();
-                            int index = 0;
-
-                            switch (list.size()) {
-                                case 1:
-                                    index = 0;
-                                    break;
-                                case 2:
-                                    for (int i = 0; i < list.size(); i++) {
-                                        if (!list.get(i).getPath().equals(path))
-                                            index = i;
-                                    }
-                                    break;
-                                default:
-                                    if (!list.isEmpty()) {
-                                        do {
-                                            index = getRandomNumber(0, list.size());
-                                        } while (list.get(index).getPath().equals(path));
-                                    }
-                                    break;
-                            }
-
-                            if (list.isEmpty()) {
-                                sharedPreferencesCenter.setShuffleMode("");
-                                initMediaPlayer(path, true);
                             } else {
-                                initMediaPlayer(list.get(index).getPath(), false);
-                                PlayerService.this.path = list.get(index).getPath();
+                                RepeatMode = sharedPreferencesCenter.getRepeatMode();
+                                if (RepeatMode == REPEAT_ONE) {
+                                    Log.i("initMediaPlayerFun","on completion call REPEAT_ONE");
+                                    initMediaPlayer(path, false);
+                                } else if (RepeatMode == REPEAT_OFF) {
+                                    initMediaPlayer(path, true);
+                                    showNotification(TYPE_PAUSE);
+                                } else {
+                                    Log.i("initMediaPlayerFun","on completion call ELSE");
+                                    setRepeat();
+                                }
                             }
-                            stopForeground(true);
-                        } else {
-                            RepeatMode = sharedPreferencesCenter.getRepeatMode();
-                            if (RepeatMode == REPEAT_ONE) {
-                                initMediaPlayer(path, false);
-                            } else if (RepeatMode == REPEAT_OFF) {
-                                initMediaPlayer(path, true);
-                                showNotification(TYPE_PAUSE);
-                            } else {
-                                setRepeat();
-                            }
+                            sendBroadcast(new Intent("com.dust.exmusic.OnMusicPlayerStateChanged"));
                         }
-                        sendBroadcast(new Intent("com.dust.exmusic.OnMusicPlayerStateChanged"));
                     }
-
                 }
             });
 
-            mediaPlayer.prepare();
+            mediaPlayer.prepareAsync();
 
         } catch (IOException e) {
             Log.i("initMediaPlayer",e.getMessage());
@@ -395,25 +421,15 @@ public class PlayerService extends Service {
                 sendBroadcast(new Intent("com.dust.exmusic.OnMusicPlayerStateChanged"));
                 break;
             case "com.dust.exmusic.ACTION_FORWARD":
-               // mediaPlayer.seekTo(mediaPlayer.getCurrentPosition() + 10000);
-                String nextPath = getPreviousAndNextPath(path).second;
+            case "com.dust.exmusic.ACTION_REWIND":
+                String nextPath = intent.getStringExtra("EXTRA_MUSIC_PATH");
                 if (nextPath != null){
                     mediaPlayer.setOnCompletionListener(null);
                     mediaPlayer.stop();
                     mediaPlayer.release();
+                    mediaPlayer = null;
                     initMediaPlayer(nextPath,false);
-                    PlayerService.this.path = nextPath;
-                }
-                break;
-            case "com.dust.exmusic.ACTION_REWIND":
-               // mediaPlayer.seekTo(mediaPlayer.getCurrentPosition() - 10000);
-                String previousPath = getPreviousAndNextPath(path).first;
-                if (previousPath != null){
-                    mediaPlayer.setOnCompletionListener(null);
-                    mediaPlayer.stop();
-                    mediaPlayer.release();
-                    initMediaPlayer(previousPath,false);
-                    PlayerService.this.path = previousPath;
+                    Log.i("ACTION_FORWARD",nextPath);
                 }
                 break;
             case "com.dust.exmusic.ACTION_SEND_PATH":

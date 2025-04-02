@@ -1,5 +1,6 @@
 package com.dust.exmusic.activities;
 
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -14,6 +15,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.view.WindowManager;
@@ -35,7 +37,6 @@ import com.dust.exmusic.interfaces.OnLoadPicture;
 import com.dust.exmusic.realm.RealmHandler;
 import com.dust.exmusic.services.PlayerService;
 import com.dust.exmusic.sharedpreferences.SharedPreferencesCenter;
-import com.gauravk.audiovisualizer.visualizer.BarVisualizer;
 import com.gauravk.audiovisualizer.visualizer.BlastVisualizer;
 
 import java.util.ArrayList;
@@ -88,6 +89,8 @@ public class PlayerActivity extends AppCompatActivity {
     private final int REPEAT_OFF = 0;
     private final int REPEAT_ON = 1;
     private final int REPEAT_ONE = 2;
+
+    private boolean serviceChangeViewPagerItem = false;
 
     private SharedPreferencesCenter sharedPreferencesCenter;
 
@@ -329,7 +332,7 @@ public class PlayerActivity extends AppCompatActivity {
                     }
                 };
 
-                handler.postDelayed(runnable, 400);
+                handler.postDelayed(runnable, 500);
             }
 
             @Override
@@ -458,8 +461,9 @@ public class PlayerActivity extends AppCompatActivity {
                 startService(intent);*/
                 try {
                     int currentItem = playerViewPager.getCurrentItem() + 1;
-                    playerViewPager.setCurrentItem(currentItem,true);
-                }catch (Exception e){}
+                    playerViewPager.setCurrentItem(currentItem, true);
+                } catch (Exception e) {
+                }
             }
         });
 
@@ -471,8 +475,9 @@ public class PlayerActivity extends AppCompatActivity {
                 startService(intent);*/
                 try {
                     int currentItem = playerViewPager.getCurrentItem() - 1;
-                    playerViewPager.setCurrentItem(currentItem,true);
-                }catch (Exception e){}
+                    playerViewPager.setCurrentItem(currentItem, true);
+                } catch (Exception e) {
+                }
             }
         });
 
@@ -597,12 +602,12 @@ public class PlayerActivity extends AppCompatActivity {
         onDataSynced = new OnDataSynced();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-            registerReceiver(onMusicPlayerStateChanged, new IntentFilter("com.dust.exmusic.OnMusicPlayerStateChanged"),RECEIVER_EXPORTED);
+            registerReceiver(onMusicPlayerStateChanged, new IntentFilter("com.dust.exmusic.OnMusicPlayerStateChanged"), RECEIVER_EXPORTED);
         else
             registerReceiver(onMusicPlayerStateChanged, new IntentFilter("com.dust.exmusic.OnMusicPlayerStateChanged"));
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-            registerReceiver(onDataSynced, new IntentFilter("com.dust.exmusic.OnDataSynced"),RECEIVER_EXPORTED);
+            registerReceiver(onDataSynced, new IntentFilter("com.dust.exmusic.OnDataSynced"), RECEIVER_EXPORTED);
         else
             registerReceiver(onDataSynced, new IntentFilter("com.dust.exmusic.OnDataSynced"));
 
@@ -699,7 +704,8 @@ public class PlayerActivity extends AppCompatActivity {
                 } else {
                     playPauseButton.setImageResource(R.drawable.gradient_play);
                 }
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
         }
     }
 
