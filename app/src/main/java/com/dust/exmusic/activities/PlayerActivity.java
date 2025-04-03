@@ -496,9 +496,6 @@ public class PlayerActivity extends AppCompatActivity {
         fastForwardButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*Intent intent = new Intent(PlayerActivity.this, PlayerService.class);
-                intent.setAction("com.dust.exmusic.ACTION_FORWARD");
-                startService(intent);*/
                 try {
                     int currentItem = playerViewPager.getCurrentItem() + 1;
                     playerViewPager.setCurrentItem(currentItem, true);
@@ -510,9 +507,6 @@ public class PlayerActivity extends AppCompatActivity {
         fastRewindButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*Intent intent = new Intent(PlayerActivity.this, PlayerService.class);
-                intent.setAction("com.dust.exmusic.ACTION_REWIND");
-                startService(intent);*/
                 try {
                     int currentItem = playerViewPager.getCurrentItem() - 1;
                     playerViewPager.setCurrentItem(currentItem, true);

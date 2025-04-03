@@ -1,6 +1,7 @@
 package com.dust.exmusic.services;
 
 import static android.app.Notification.PRIORITY_LOW;
+import static android.app.Notification.PRIORITY_MIN;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -23,6 +24,7 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 import android.util.Pair;
+import android.widget.RemoteViews;
 
 import androidx.core.app.NotificationCompat;
 
@@ -426,7 +428,10 @@ public class PlayerService extends Service {
                 sendBroadcast(new Intent("com.dust.exmusic.OnMusicPlayerStateChanged"));
                 break;
             case "com.dust.exmusic.ACTION_FORWARD":
+                goToNextMusic();
+                break;
             case "com.dust.exmusic.ACTION_REWIND":
+                goToPrevMusic();
                 break;
             case "com.dust.exmusic.ACTION_NEW_MUSIC":
                 String nextPath = intent.getStringExtra("EXTRA_MUSIC_PATH");
@@ -566,40 +571,75 @@ public class PlayerService extends Service {
                     bitmap = BitmapFactory.decodeResource(getBaseContext().getResources(), R.drawable.empty_music_pic);
 
                 int icon = 0;
-                if (type == TYPE_PLAY) {
-                    icon = R.drawable.ic_baseline_pause_white;
+
+                NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(PlayerService.this, createNotificationChannel());
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
+
+                    if (type == TYPE_PLAY) {
+                        icon = R.drawable.ic_baseline_pause_white;
+                    } else {
+                        icon = R.drawable.ic_baseline_play_arrow_white;
+                    }
+
+                    try {
+                        MediaMetadataCompat.Builder mediaMetadataCompat = new MediaMetadataCompat.Builder();
+                        mediaMetadataCompat.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, mediaPlayer.getDuration());
+                        mediaSessionCompat.setMetadata(mediaMetadataCompat.build());
+
+                        int state = PlaybackStateCompat.STATE_PLAYING;
+                        if (type == TYPE_PAUSE)
+                            state = PlaybackStateCompat.STATE_PAUSED;
+
+                        PlaybackStateCompat.Builder pbs = new PlaybackStateCompat.Builder().setState(state, mediaPlayer.getCurrentPosition(), 1.0f)
+                                .setActions(PlaybackStateCompat.ACTION_SEEK_TO | PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_PAUSE | PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS);
+
+                        mediaSessionCompat.setPlaybackState(pbs.build());
+                    } catch (Exception e) {}
+
+                    notificationBuilder
+                            .setSmallIcon(icon)
+                            .setLargeIcon(bitmap)
+                            .setContentTitle(getMusicDataByPath(path).getMusicName())
+                            .setStyle(new androidx.media.app.NotificationCompat.MediaStyle().setMediaSession(mediaSessionCompat.getSessionToken()))
+                            .setPriority(PRIORITY_LOW)
+                            .setContentText(getMusicDataByPath(path).getArtistName())
+                            .setContentIntent(PendingIntent.getActivity(PlayerService.this, 102, mainIntent, PendingIntent.FLAG_IMMUTABLE));
+
+                    startForeground(101, notificationBuilder.build());
                 } else {
-                    icon = R.drawable.ic_baseline_play_arrow_white;
+
+                    if (type == TYPE_PLAY) {
+                        icon = R.drawable.gradient_pause;
+                    } else {
+                        icon = R.drawable.gradient_play;
+                    }
+
+                    Notification notification = notificationBuilder
+                            .setSmallIcon(R.drawable.playlist)
+                            .setLargeIcon(bitmap)
+                            .setContentTitle(getMusicDataByPath(path).getMusicName())
+                            .setContentText(getMusicDataByPath(path).getArtistName())
+                            .setCustomContentView(new RemoteViews(getPackageName(), R.layout.notification_normal))
+                            .setCustomBigContentView(new RemoteViews(getPackageName(), R.layout.notification_layout))
+                            .setContentIntent(PendingIntent.getActivity(PlayerService.this, 102, mainIntent, PendingIntent.FLAG_UPDATE_CURRENT))
+                            .build();
+
+                    notification.contentView.setImageViewBitmap(R.id.mainImage, bitmap);
+                    notification.contentView.setTextViewText(R.id.musicName, getMusicDataByPath(path).getMusicName());
+                    notification.contentView.setTextViewText(R.id.artistName, getMusicDataByPath(path).getArtistName());
+
+                    notification.bigContentView.setOnClickPendingIntent(R.id.close, PendingIntent.getService(PlayerService.this, 101, intent1, PendingIntent.FLAG_IMMUTABLE));
+                    notification.bigContentView.setImageViewBitmap(R.id.mainImage, bitmap);
+                    notification.bigContentView.setImageViewResource(R.id.play, icon);
+                    notification.bigContentView.setTextViewText(R.id.musicName, getMusicDataByPath(path).getMusicName());
+                    notification.bigContentView.setTextViewText(R.id.artistName, getMusicDataByPath(path).getArtistName());
+                    notification.bigContentView.setOnClickPendingIntent(R.id.rewind, PendingIntent.getService(PlayerService.this, 103, intentRewind, PendingIntent.FLAG_IMMUTABLE));
+                    notification.bigContentView.setOnClickPendingIntent(R.id.play, PendingIntent.getService(PlayerService.this, 103, intentPlay, PendingIntent.FLAG_IMMUTABLE));
+                    notification.bigContentView.setOnClickPendingIntent(R.id.forward, PendingIntent.getService(PlayerService.this, 103, intentForward, PendingIntent.FLAG_IMMUTABLE));
+
+                    startForeground(101, notification);
                 }
-
-                try {
-                    MediaMetadataCompat.Builder mediaMetadataCompat = new MediaMetadataCompat.Builder();
-                    mediaMetadataCompat.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, mediaPlayer.getDuration());
-                    mediaSessionCompat.setMetadata(mediaMetadataCompat.build());
-
-                    int state = PlaybackStateCompat.STATE_PLAYING;
-                    if (type == TYPE_PAUSE)
-                        state = PlaybackStateCompat.STATE_PAUSED;
-
-                    PlaybackStateCompat.Builder pbs = new PlaybackStateCompat.Builder().setState(state, mediaPlayer.getCurrentPosition(), 1.0f)
-                            .setActions(PlaybackStateCompat.ACTION_SEEK_TO | PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_PAUSE | PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS);
-
-                    mediaSessionCompat.setPlaybackState(pbs.build());
-                } catch (Exception e) {
-                }
-
-                Notification notification = new NotificationCompat.Builder(PlayerService.this, createNotificationChannel())
-                        .setSmallIcon(icon)
-                        .setLargeIcon(bitmap)
-                        .setContentTitle(getMusicDataByPath(path).getMusicName())
-                        .setStyle(new androidx.media.app.NotificationCompat.MediaStyle().setMediaSession(mediaSessionCompat.getSessionToken()).setShowActionsInCompactView(0, 1, 2))
-                        .setPriority(PRIORITY_LOW)
-                        .setContentText(getMusicDataByPath(path).getArtistName())
-                        .setContentIntent(PendingIntent.getActivity(PlayerService.this, 102, mainIntent, PendingIntent.FLAG_IMMUTABLE))
-                        .build();
-
-                startForeground(101, notification);
-
             }
         });
     }
