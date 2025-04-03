@@ -17,6 +17,7 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -63,6 +64,8 @@ public class PlayerService extends Service {
 
     private int lastNotificationType = TYPE_PAUSE;
 
+    private PowerManager.WakeLock cpuWakeLock;
+
     private SharedPreferencesCenter sharedPreferencesCenter;
 
     private MediaSessionCompat mediaSessionCompat;
@@ -75,6 +78,7 @@ public class PlayerService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        acquireCpuWakeLock();
         notificationUpdaterTimer = new Timer("notificationtimer");
         notificationUpdaterTimer.schedule(new TimerTask() {
             @Override
@@ -82,8 +86,9 @@ public class PlayerService extends Service {
                 if (lastNotificationType != TYPE_PAUSE)
                     showNotification(lastNotificationType);
             }
-        }, 0, 200);
+        }, 0, 1000);
         mediaSessionCompat = new MediaSessionCompat(this, "media_session_main");
+        mediaSessionCompat.setActive(true);
         mediaSessionCompat.setCallback(new MediaSessionCompat.Callback() {
             @Override
             public void onSeekTo(long pos) {
@@ -126,6 +131,11 @@ public class PlayerService extends Service {
                 goToPrevMusic();
             }
         });
+    }
+
+    private void acquireCpuWakeLock() {
+        cpuWakeLock = ((PowerManager) getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,PlayerService.class.getSimpleName());
+        cpuWakeLock.acquire();
     }
 
     private void goToNextMusic() {
@@ -195,7 +205,6 @@ public class PlayerService extends Service {
                             for (int i = 0; i < datas.size(); i++) {
                                 if (datas.get(i).getPath().equals(path)) {
 
-                                    //      mediaPlayer.release();
                                     if (i == datas.size() - 1) {
                                         switch (sharedPreferencesCenter.getRepeatMode()) {
                                             case REPEAT_OFF:
@@ -247,7 +256,6 @@ public class PlayerService extends Service {
                                         break;
                                 }
 
-                                // mediaPlayer.release();
                                 int index = 0;
 
                                 switch (list.size()) {
@@ -299,7 +307,7 @@ public class PlayerService extends Service {
             mediaPlayer.prepareAsync();
 
         } catch (Exception e) {
-
+            Log.i("mediaplayerInit",e.getMessage());
         }
     }
 
@@ -422,6 +430,7 @@ public class PlayerService extends Service {
                 break;
             case "com.dust.exmusic.ACTION_NEW_MUSIC":
                 String nextPath = intent.getStringExtra("EXTRA_MUSIC_PATH");
+                Log.i("ACTION_NEW_MUSIC","call :" + nextPath);
                 if (nextPath != null && !path.equals(nextPath)) {
                     initMediaPlayer(nextPath, false);
                 }
@@ -436,10 +445,7 @@ public class PlayerService extends Service {
             case "com.dust.exmusic.ACTION_RESET":
                 try {
                     if (!path.equals(intent.getExtras().getString("PATH"))) {
-                        mediaPlayer.stop();
-                        mediaPlayer.release();
                         initMediaPlayer(intent.getExtras().getString("PATH"), false);
-                        stopForeground(true);
                     }
                 } catch (Exception e) {
                 }
@@ -606,6 +612,11 @@ public class PlayerService extends Service {
 
     @Override
     public void onDestroy() {
+        if (cpuWakeLock != null){
+            if (cpuWakeLock.isHeld())
+                cpuWakeLock.release();
+        }
+
         if (notificationUpdaterTimer != null) {
             notificationUpdaterTimer.purge();
             notificationUpdaterTimer.cancel();
