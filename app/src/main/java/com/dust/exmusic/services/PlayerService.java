@@ -468,8 +468,6 @@ public class PlayerService extends Service {
     }
 
     private List<MainDataClass> getListByType() {
-        externalRealmHandler.getAllSortedMainData(sharedPreferencesCenter.getSortType());
-
         if (!sharedPreferencesCenter.getPlaylistActive().isEmpty()) {
             return getPlayListData(sharedPreferencesCenter.getPlaylistActive());
         } else {
