@@ -219,7 +219,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     intent.putExtra("PLAY_LIST", "FavoriteList|FavoriteList");
                 }
                 startActivity(intent);
-                throw new RuntimeException("test exception");
             }
         });
     }

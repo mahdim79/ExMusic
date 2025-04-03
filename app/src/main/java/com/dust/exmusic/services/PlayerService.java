@@ -15,6 +15,7 @@ import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
@@ -128,25 +129,21 @@ public class PlayerService extends Service {
     }
 
     private void goToNextMusic() {
-        String nextPath = getPreviousAndNextPath(path).second;
-        if (nextPath != null) {
-            mediaPlayer.setOnCompletionListener(null);
-            mediaPlayer.stop();
-            mediaPlayer.release();
-            mediaPlayer = null;
-            initMediaPlayer(nextPath, false);
-        }
+        try{
+            String nextPath = getPreviousAndNextPath(path).second;
+            if (nextPath != null) {
+                initMediaPlayer(nextPath, false);
+            }
+        }catch (Exception e){}
     }
 
     private void goToPrevMusic() {
-        String previousPath = getPreviousAndNextPath(path).first;
-        if (previousPath != null) {
-            mediaPlayer.setOnCompletionListener(null);
-            mediaPlayer.stop();
-            mediaPlayer.release();
-            mediaPlayer = null;
-            initMediaPlayer(previousPath, false);
-        }
+        try{
+            String previousPath = getPreviousAndNextPath(path).first;
+            if (previousPath != null) {
+                initMediaPlayer(previousPath, false);
+            }
+        }catch (Exception e){}
     }
 
     private void initMediaPlayer(String path, boolean offMode) {
@@ -156,12 +153,11 @@ public class PlayerService extends Service {
             try {
                 mediaPlayer.setOnCompletionListener(null);
                 mediaPlayer.stop();
-                mediaPlayer.release();
-                mediaPlayer = null;
+                mediaPlayer.reset();
             } catch (Exception e) {
             }
-            mediaPlayer = new MediaPlayer();
-            mediaPlayer.setLooping(false);
+            if (mediaPlayer == null)
+                mediaPlayer = new MediaPlayer();
             mediaPlayer.setDataSource(path);
             mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
@@ -302,8 +298,8 @@ public class PlayerService extends Service {
 
             mediaPlayer.prepareAsync();
 
-        } catch (IOException e) {
-            Log.i("initMediaPlayer", e.getMessage());
+        } catch (Exception e) {
+
         }
     }
 
@@ -423,14 +419,11 @@ public class PlayerService extends Service {
                 break;
             case "com.dust.exmusic.ACTION_FORWARD":
             case "com.dust.exmusic.ACTION_REWIND":
+                break;
+            case "com.dust.exmusic.ACTION_NEW_MUSIC":
                 String nextPath = intent.getStringExtra("EXTRA_MUSIC_PATH");
-                if (nextPath != null) {
-                    mediaPlayer.setOnCompletionListener(null);
-                    mediaPlayer.stop();
-                    mediaPlayer.release();
-                    mediaPlayer = null;
+                if (nextPath != null && !path.equals(nextPath)) {
                     initMediaPlayer(nextPath, false);
-                    Log.i("ACTION_FORWARD", nextPath);
                 }
                 break;
             case "com.dust.exmusic.ACTION_SEND_PATH":
