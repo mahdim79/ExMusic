@@ -194,9 +194,9 @@ public class RealmHandler {
         return list;
     }
 
-    public int getAllDataCount() {
+    public long getAllDataCount() {
         try {
-            return realm.where(MainObject.class).findAll().size();
+            return realm.where(MainObject.class).count();
         } catch (Exception e) {
             return 0;
         }

@@ -98,9 +98,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private SharedPreferencesCenter sharedPreferencesCenter;
 
-    private int allDataCount = 0;
     private int favDataCount = 0;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,12 +113,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setUpSearchImg();
         setPrimaryImportantData();
         setUpFloatingActionButton();
-        new Handler(getMainLooper()).postDelayed(new Runnable() {
-            @Override
-            public void run() {
-
-            }
-        },2000);
     }
 
     private void adjustFontScale() {
@@ -168,13 +160,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void setPrimaryImportantData() {
-        allDataCount = handler.getAllDataCount();
         String[] favData = sharedPreferencesCenter.getFavoriteListPaths();
         if (!favData[0].equals(""))
             favDataCount = favData.length;
     }
 
     private void optimizeFloatingActionButton(int position) {
+        long allDataCount = handler.getAllDataCount();
         switch (position) {
             case 0:
                 ShuffleFloatingType = ALL_SHUFFLE_TYPE;
