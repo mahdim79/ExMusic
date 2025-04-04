@@ -262,6 +262,15 @@ public class SinglePlayListFragment extends Fragment {
                     }
                 }
             } else {
+
+                if (sharedPreferencesCenter.getPlaylistActive().equals(getArguments().getString("NAME"))){
+                    sharedPreferencesCenter.setLastPlayMode("ALL|ALL");
+                    sharedPreferencesCenter.setPlayPair("ALL|ALL");
+                    sharedPreferencesCenter.setPlaylistActive("");
+                    if (!sharedPreferencesCenter.getShuffleMode().isEmpty())
+                        sharedPreferencesCenter.setShuffleMode("");
+                }
+
                 if (finList.isEmpty()) {
                     setUpEmptyView();
                 } else {

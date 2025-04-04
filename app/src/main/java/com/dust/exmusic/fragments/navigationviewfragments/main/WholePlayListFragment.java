@@ -262,6 +262,11 @@ public class WholePlayListFragment extends Fragment {
                 for (int i = 0; i < removeList.size(); i++) {
                     sharedPreferencesCenter.removePlayList(removeList.get(i));
                     handler.deletePlayListSongs(removeList.get(i));
+                    if (sharedPreferencesCenter.getPlaylistActive().equals(removeList.get(i))){
+                        sharedPreferencesCenter.setPlaylistActive("");
+                        sharedPreferencesCenter.setLastPlayMode("ALL|ALL");
+                        sharedPreferencesCenter.setPlayPair("ALL|ALL");
+                    }
                 }
                 Toast.makeText(getActivity(), getActivity().getResources().getString(R.string.done), Toast.LENGTH_SHORT).show();
                 resetDeleteMode();
