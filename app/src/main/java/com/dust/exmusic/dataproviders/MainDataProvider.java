@@ -10,6 +10,7 @@ import com.dust.exmusic.interfaces.OnLoadData;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class MainDataProvider {
@@ -50,6 +51,20 @@ public class MainDataProvider {
 
     private List<Pair<String,Long>> filterDuplicateData(List<Pair<String,Long>> data){
         List<Pair<String,Long>> filteredData = new ArrayList<>();
+
+        // move duplicated musics to the end of the list
+        data.sort(new Comparator<Pair<String, Long>>() {
+            @Override
+            public int compare(Pair<String, Long> o1, Pair<String, Long> o2) {
+                if ((o1.first.contains("(") && o1.first.contains(")") && (o1.first.indexOf(")") - o1.first.indexOf("(") == 2)) && !(o2.first.contains("(") && o2.first.contains(")") && (o2.first.indexOf(")") - o2.first.indexOf("(") == 2))){
+                    return 1;
+                }
+                if (!(o1.first.contains("(") && o1.first.contains(")") && (o1.first.indexOf(")") - o1.first.indexOf("(") == 2)) && (o2.first.contains("(") && o2.first.contains(")") && (o2.first.indexOf(")") - o2.first.indexOf("(") == 2))){
+                    return -1;
+                }
+                return 0;
+            }
+        });
 
         for (int i = 0;i<data.size();i++){
             String path = data.get(i).first;
