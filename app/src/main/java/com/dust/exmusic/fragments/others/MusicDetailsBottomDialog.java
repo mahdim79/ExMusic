@@ -15,10 +15,12 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.dust.exmusic.R;
+import com.dust.exmusic.application.MyApplication;
 import com.dust.exmusic.customviews.CButton;
 import com.dust.exmusic.customviews.CTextView;
 import com.dust.exmusic.dataclasses.MainDataClass;
@@ -79,10 +81,12 @@ public class MusicDetailsBottomDialog extends BottomSheetDialogFragment {
             @Override
             public void onClick(View view) {
                 dismiss();
+
+                Uri uri = FileProvider.getUriForFile(requireContext(),"com.dust.exmusic.fileprovider",new File(path));
                 Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.setType("audio/*");
                 intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(path)));
+                intent.putExtra(Intent.EXTRA_STREAM, uri);
                 getActivity().startActivity(Intent.createChooser(intent, getActivity().getResources().getString(R.string.sendVia)));
             }
         });

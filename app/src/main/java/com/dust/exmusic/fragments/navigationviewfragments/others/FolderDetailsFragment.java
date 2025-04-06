@@ -81,7 +81,7 @@ public class FolderDetailsFragment extends Fragment {
                 Intent intent = new Intent(getActivity(), PlayerActivity.class);
                 intent.putExtra("PATH", data.get(0).getPath());
                 intent.putExtra("SHUFFLE_MODE", "Folders");
-                intent.putExtra("PLAY_LIST", getJoinedShuffleMode("Folders", getArguments().getString("NAME")));
+                intent.putExtra("PLAY_LIST", getJoinedShuffleMode("Folders", getArguments().getString("NAME").substring(0, getArguments().getString("NAME").lastIndexOf("/"))));
                 getActivity().startActivity(intent);
             }
         });
@@ -123,11 +123,11 @@ public class FolderDetailsFragment extends Fragment {
 
     private void setUpAlphaAnimation() {
         AlphaAnimation alphaAnimation = new AlphaAnimation(0f, 1f);
-        alphaAnimation.setDuration(1000);
+        alphaAnimation.setDuration(500);
         alphaAnimation.setFillAfter(true);
 
         ScaleAnimation scaleAnimation = new ScaleAnimation(0f, 1f, 0f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-        scaleAnimation.setDuration(1000);
+        scaleAnimation.setDuration(500);
 
         set.addAnimation(alphaAnimation);
         set.addAnimation(scaleAnimation);

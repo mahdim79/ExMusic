@@ -200,48 +200,51 @@
           <com.google.android.material.appbar.AppBarLayout
               android:id="@+id/appbarLayout"
               android:layout_width="match_parent"
+              app:liftOnScroll="false"
+              app:elevation="0dp"
+              android:elevation="0dp"
               android:layout_height="wrap_content">
-              <com.google.android.material.appbar.CollapsingToolbarLayout
+
+              <androidx.constraintlayout.widget.ConstraintLayout
                   android:layout_width="match_parent"
-                  app:titleEnabled="false"
-                  app:contentScrim="?colorSurface"
-                  app:layout_scrollFlags="scroll|snap|exitUntilCollapsed|enterAlways"
                   android:layout_height="wrap_content">
 
-                  <RelativeLayout
+                  <com.dust.exmusic.customviews.CTextView
+                      android:layout_width="wrap_content"
+                      android:text="@string/app_name"
+                      android:layout_centerInParent="true"
+                      android:textSize="19sp"
+                      app:layout_constraintStart_toStartOf="parent"
+                      app:layout_constraintEnd_toEndOf="parent"
+                      app:layout_constraintTop_toTopOf="@+id/toolbar"
+                      app:layout_constraintBottom_toBottomOf="@+id/toolbar"
+                      android:layout_height="wrap_content"/>
+
+                  <androidx.appcompat.widget.Toolbar
+                      android:id="@+id/toolbar"
                       android:layout_width="match_parent"
-                      app:layout_collapseMode="parallax"
-                      android:layout_height="250dp">
-                      <ImageView
-                          android:id="@+id/headerImage"
+                      app:layout_collapseMode="pin"
+                      app:layout_constraintTop_toTopOf="parent"
+                      app:layout_constraintStart_toStartOf="parent"
+                      app:layout_constraintEnd_toEndOf="parent"
+                      android:layout_marginTop="@dimen/standardMargin3x"
+                      android:layoutDirection="rtl"
+                      android:layout_height="?attr/actionBarSize">
+                      <RelativeLayout
                           android:layout_width="match_parent"
-                          android:layout_height="match_parent"
-                          tools:src="@drawable/bg_one"
-                          android:scaleType="centerCrop"
-                          android:adjustViewBounds="true"/>
+                          android:layout_height="match_parent">
+                          <ImageView
+                              android:id="@+id/imgSearch"
+                              android:layout_width="30dp"
+                              android:layout_height="match_parent"
+                              android:layout_alignParentEnd="true"
+                              android:layout_marginEnd="@dimen/standardMargin1.5x"
+                              android:src="@drawable/gradient_search"/>
+                      </RelativeLayout>
 
-                  </RelativeLayout>
-              <androidx.appcompat.widget.Toolbar
-                  android:id="@+id/toolbar"
-                  android:layout_width="match_parent"
-                  app:layout_collapseMode="pin"
-                  android:layout_marginTop="@dimen/standardMargin2x"
-                  android:layoutDirection="rtl"
-                  android:layout_height="?attr/actionBarSize">
-                  <RelativeLayout
-                      android:layout_width="match_parent"
-                      android:layout_height="match_parent">
-                      <ImageView
-                          android:id="@+id/imgSearch"
-                          android:layout_width="30dp"
-                          android:layout_height="match_parent"
-                          android:layout_alignParentEnd="true"
-                          android:layout_marginEnd="@dimen/standardMargin1.5x"
-                          android:src="@drawable/gradient_search"/>
-                  </RelativeLayout>
+                  </androidx.appcompat.widget.Toolbar>
 
-              </androidx.appcompat.widget.Toolbar>
-              </com.google.android.material.appbar.CollapsingToolbarLayout>
+              </androidx.constraintlayout.widget.ConstraintLayout>
 
           </com.google.android.material.appbar.AppBarLayout>
 

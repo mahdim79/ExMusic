@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.DisplayMetrics;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.widget.TextView;
@@ -21,6 +22,7 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         seExTheme();
         super.onCreate(savedInstanceState);
+        adjustFontScale();
         setContentView(R.layout.activity_splash);
         setUpEnglishLanguage();
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
@@ -43,6 +45,18 @@ public class SplashActivity extends AppCompatActivity {
             }
         }, 1500);
 
+    }
+
+    private void adjustFontScale() {
+        Configuration configuration = getResources().getConfiguration();
+        if (configuration.fontScale != 1.0f) {
+            configuration.fontScale = 1.0f;
+            DisplayMetrics metrics = getResources().getDisplayMetrics();
+            WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
+            wm.getDefaultDisplay().getMetrics(metrics);
+            metrics.scaledDensity = configuration.fontScale * metrics.density;
+            getBaseContext().getResources().updateConfiguration(configuration, metrics);
+        }
     }
 
     private void setUpEnglishLanguage() {

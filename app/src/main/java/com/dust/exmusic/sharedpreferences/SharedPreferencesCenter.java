@@ -105,6 +105,14 @@ public class SharedPreferencesCenter {
         return context.getSharedPreferences("SETTINGS", Context.MODE_PRIVATE).getString("SHUFFLE_MODE", "");
     }
 
+    public void setLastPlayMode(String mode) {
+        context.getSharedPreferences("SETTINGS", Context.MODE_PRIVATE).edit().putString("LAST_PLAY_MODE", mode).apply();
+    }
+
+    public String getLastPlayMode() {
+        return context.getSharedPreferences("SETTINGS", Context.MODE_PRIVATE).getString("LAST_PLAY_MODE", "ALL|ALL");
+    }
+
     public int getSortType() {
         return context.getSharedPreferences("SETTINGS", Context.MODE_PRIVATE).getInt("SORT_TYPE", 1);
 

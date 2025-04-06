@@ -1,16 +1,21 @@
 package com.dust.exmusic.activities;
 
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.view.WindowManager;
@@ -32,13 +37,15 @@ import com.dust.exmusic.interfaces.OnLoadPicture;
 import com.dust.exmusic.realm.RealmHandler;
 import com.dust.exmusic.services.PlayerService;
 import com.dust.exmusic.sharedpreferences.SharedPreferencesCenter;
-import com.gauravk.audiovisualizer.visualizer.CircleLineVisualizer;
+import com.gauravk.audiovisualizer.visualizer.BlastVisualizer;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import at.favre.lib.dali.Dali;
 
 public class PlayerActivity extends AppCompatActivity {
 
@@ -56,7 +63,7 @@ public class PlayerActivity extends AppCompatActivity {
     private ImageView othersImage;
     private ImageView addToFavImage;
     private ImageView shuffleButton;
-    private CircleLineVisualizer circleLineVisualizer;
+    private BlastVisualizer blastVisualizer;
 
     private boolean firstEntry = true;
 
@@ -77,12 +84,15 @@ public class PlayerActivity extends AppCompatActivity {
 
     List<MainDataClass> list = new ArrayList<>();
 
-    private final int ShuffleModeOn = 1;
-    private final int ShuffleModeOff = 0;
+    private int blurRadius = 17;
 
     private final int REPEAT_OFF = 0;
     private final int REPEAT_ON = 1;
     private final int REPEAT_ONE = 2;
+
+    private ViewPager.OnPageChangeListener viewPagerListener;
+
+    private boolean serviceChangeViewPagerItem = false;
 
     private SharedPreferencesCenter sharedPreferencesCenter;
 
@@ -93,6 +103,7 @@ public class PlayerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         seExTheme();
         super.onCreate(savedInstanceState);
+        adjustFontScale();
         setContentView(R.layout.activity_player);
         setUpDataBase();
         setUpSharedPreferences();
@@ -105,6 +116,43 @@ public class PlayerActivity extends AppCompatActivity {
         setUpService(getIntent().getExtras().getString("PATH"));
         setUpAddToFavoriteImage(getIntent().getExtras().getString("PATH"));
         setUpShuffleButton();
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        Context myContext = newBase;
+
+        try {
+            String localeStr;
+            if (new SharedPreferencesCenter(this).getEnglishLanguage())
+                localeStr = "en";
+            else
+                localeStr = "fa";
+            Locale locale = new Locale(localeStr);
+            Locale.setDefault(locale);
+
+            Configuration configuration = newBase.getResources().getConfiguration();
+            configuration.setLayoutDirection(new Locale(localeStr));
+            configuration.setLocale(locale);
+            Context newContext = newBase.createConfigurationContext(configuration);
+            if (newContext != null)
+                myContext = newContext;
+        } catch (Exception e) {
+        }
+        super.attachBaseContext(myContext);
+    }
+
+
+    private void adjustFontScale() {
+        Configuration configuration = getResources().getConfiguration();
+        if (configuration.fontScale != 1.0f) {
+            configuration.fontScale = 1.0f;
+            DisplayMetrics metrics = getResources().getDisplayMetrics();
+            WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
+            wm.getDefaultDisplay().getMetrics(metrics);
+            metrics.scaledDensity = configuration.fontScale * metrics.density;
+            getBaseContext().getResources().updateConfiguration(configuration, metrics);
+        }
     }
 
     private void seExTheme() {
@@ -222,12 +270,14 @@ public class PlayerActivity extends AppCompatActivity {
 
         } else if (getIntent().getExtras().containsKey("SHUFFLE_MODE")) {
             sharedPreferencesCenter.setPlayPair(getIntent().getExtras().getString("PLAY_LIST"));
+            sharedPreferencesCenter.setLastPlayMode(getIntent().getExtras().getString("PLAY_LIST"));
             setUpListByShuffle();
 
         } else {
 
             if (getIntent().getExtras().containsKey("PLAY_LIST")) {
                 sharedPreferencesCenter.setPlayPair(getIntent().getExtras().getString("PLAY_LIST"));
+                sharedPreferencesCenter.setLastPlayMode(getIntent().getExtras().getString("PLAY_LIST"));
                 setUpListByType(getIntent().getExtras().getString("PLAY_LIST"));
             }
 
@@ -276,6 +326,7 @@ public class PlayerActivity extends AppCompatActivity {
         }
         playerViewPager.setOffscreenPageLimit(0);
         currentPath = getIntent().getExtras().getString("PATH");
+
         playerViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -293,25 +344,32 @@ public class PlayerActivity extends AppCompatActivity {
                 runnable = new Runnable() {
                     @Override
                     public void run() {
-                        setUpService(dataClasses.get(position).getPath());
-                        currentPath = dataClasses.get(position).getPath();
-                        setUpAddToFavoriteImage(currentPath);
-                        new MetaDataLoader(PlayerActivity.this).getPicture(currentPath, new OnLoadPicture() {
-                            @Override
-                            public void onGetPicture(Bitmap bitmap) {
-                                if (bitmap != null)
-                                    transparentImage.setImageBitmap(bitmap);
-                                else
-                                    transparentImage.setImageResource(R.drawable.empty_music_pic);
-                                transparentImage.startAnimation(alphaAnimation);
+                        Log.i("onPageSelected", "onPageSelected");
+                        try {
+                            Intent newMusicIntent = new Intent(PlayerActivity.this, PlayerService.class);
+                            newMusicIntent.setAction("com.dust.exmusic.ACTION_NEW_MUSIC");
+                            newMusicIntent.putExtra("EXTRA_MUSIC_PATH", dataClasses.get(position).getPath());
+                            PendingIntent.getForegroundService(PlayerActivity.this, (int) System.currentTimeMillis() / 1000, newMusicIntent, PendingIntent.FLAG_MUTABLE).send();
 
-                            }
-                        });
-                        handler = null;
+                            currentPath = dataClasses.get(position).getPath();
+                            setUpAddToFavoriteImage(currentPath);
+                            new MetaDataLoader(PlayerActivity.this).getPicture(currentPath, new OnLoadPicture() {
+                                @Override
+                                public void onGetPicture(Bitmap bitmap) {
+                                    if (bitmap != null)
+                                        Dali.create(PlayerActivity.this).load(bitmap).blurRadius(blurRadius).into(transparentImage);
+                                    else
+                                        Dali.create(PlayerActivity.this).load(R.drawable.empty_music_pic).blurRadius(blurRadius).into(transparentImage);
+                                    transparentImage.startAnimation(alphaAnimation);
+
+                                }
+                            });
+                            handler = null;
+                        } catch (Exception e) {}
                     }
                 };
 
-                handler.postDelayed(runnable, 400);
+                handler.postDelayed(runnable, 600);
             }
 
             @Override
@@ -345,23 +403,26 @@ public class PlayerActivity extends AppCompatActivity {
         bindService(intent, new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-                PlayerService.MyBinder binder = (PlayerService.MyBinder) iBinder;
-                PlayerService playerService = binder.getService();
-                PlayerActivity.this.mediaPlayer = playerService.mediaPlayer;
-                setUpVisualizer(mediaPlayer.getAudioSessionId());
-                setUpMediaController();
-                if (mediaPlayer.getCurrentPosition() > 0) {
-                    totalTime.setText(calculateTimer(mediaPlayer.getDuration()));
-                    if (mediaPlayer.isPlaying()) {
-                        playPauseButton.setImageResource(R.drawable.gradient_pause);
+                try {
+                    PlayerService.MyBinder binder = (PlayerService.MyBinder) iBinder;
+                    PlayerService playerService = binder.getService();
+                    PlayerActivity.this.mediaPlayer = playerService.mediaPlayer;
+                    setUpVisualizer(mediaPlayer.getAudioSessionId());
+                    setUpMediaController();
+                    if (mediaPlayer.getCurrentPosition() >= 0) {
+                        totalTime.setText(calculateTimer(mediaPlayer.getDuration()));
+                        if (mediaPlayer.isPlaying()) {
+                            playPauseButton.setImageResource(R.drawable.gradient_pause);
+                        } else {
+                            playPauseButton.setImageResource(R.drawable.gradient_play);
+                        }
                     } else {
-                        playPauseButton.setImageResource(R.drawable.gradient_play);
+                        playPauseButton.setImageResource(R.drawable.gradient_pause);
+                        totalTime.setText(calculateTimer(mediaPlayer.getDuration()));
                     }
-                } else {
-                    playPauseButton.setImageResource(R.drawable.gradient_pause);
-                    totalTime.setText(calculateTimer(mediaPlayer.getDuration()));
+                    enableMediaController();
+                } catch (Exception e) {
                 }
-                enableMediaController();
             }
 
             @Override
@@ -372,7 +433,7 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     private void setUpViews() {
-        circleLineVisualizer = (CircleLineVisualizer) findViewById(R.id.visualizer);
+        blastVisualizer = (BlastVisualizer) findViewById(R.id.visualizer);
         playPauseButton = (ImageView) findViewById(R.id.playPauseButton);
         playerViewPager = (ViewPager) findViewById(R.id.playerViewPager);
         fastRewindButton = (ImageView) findViewById(R.id.fastRewindButton);
@@ -389,13 +450,13 @@ public class PlayerActivity extends AppCompatActivity {
         shuffleButton = (ImageView) findViewById(R.id.shuffleButton);
 
         musicSeekbar.setEnabled(false);
+        Dali.create(PlayerActivity.this).load(R.drawable.empty_music_pic).blurRadius(blurRadius).into(transparentImage);
 
         new MetaDataLoader(PlayerActivity.this).getPicture(getIntent().getExtras().getString("PATH"), new OnLoadPicture() {
             @Override
             public void onGetPicture(Bitmap bitmap) {
                 if (bitmap != null) {
-                    transparentImage.setImageBitmap(bitmap);
-
+                    Dali.create(PlayerActivity.this).load(bitmap).blurRadius(blurRadius).into(transparentImage);
                 }
             }
         });
@@ -435,18 +496,22 @@ public class PlayerActivity extends AppCompatActivity {
         fastForwardButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(PlayerActivity.this, PlayerService.class);
-                intent.setAction("com.dust.exmusic.ACTION_FORWARD");
-                startService(intent);
+                try {
+                    int currentItem = playerViewPager.getCurrentItem() + 1;
+                    playerViewPager.setCurrentItem(currentItem, true);
+                } catch (Exception e) {
+                }
             }
         });
 
         fastRewindButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(PlayerActivity.this, PlayerService.class);
-                intent.setAction("com.dust.exmusic.ACTION_REWIND");
-                startService(intent);
+                try {
+                    int currentItem = playerViewPager.getCurrentItem() - 1;
+                    playerViewPager.setCurrentItem(currentItem, true);
+                } catch (Exception e) {
+                }
             }
         });
 
@@ -569,8 +634,17 @@ public class PlayerActivity extends AppCompatActivity {
         super.onStart();
         onMusicPlayerStateChanged = new OnMusicPlayerStateChanged();
         onDataSynced = new OnDataSynced();
-        registerReceiver(onMusicPlayerStateChanged, new IntentFilter("com.dust.exmusic.OnMusicPlayerStateChanged"));
-        registerReceiver(onDataSynced, new IntentFilter("com.dust.exmusic.OnDataSynced"));
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+            registerReceiver(onMusicPlayerStateChanged, new IntentFilter("com.dust.exmusic.OnMusicPlayerStateChanged"), RECEIVER_EXPORTED);
+        else
+            registerReceiver(onMusicPlayerStateChanged, new IntentFilter("com.dust.exmusic.OnMusicPlayerStateChanged"));
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+            registerReceiver(onDataSynced, new IntentFilter("com.dust.exmusic.OnDataSynced"), RECEIVER_EXPORTED);
+        else
+            registerReceiver(onDataSynced, new IntentFilter("com.dust.exmusic.OnDataSynced"));
+
         if (timer != null) {
             timer = new Timer();
             timer.schedule(new MainTimerTask(), 0, 500);
@@ -633,8 +707,9 @@ public class PlayerActivity extends AppCompatActivity {
                 currentPath = intent.getExtras().getString("PATH");
                 bindMediaPlayerService(currentPath);
                 for (int i = 0; i < list.size(); i++) {
-                    if (list.get(i).getPath().equals(currentPath))
+                    if (list.get(i).getPath().equals(currentPath)) {
                         playerViewPager.setCurrentItem(i);
+                    }
                 }
             }
         }
@@ -665,7 +740,6 @@ public class PlayerActivity extends AppCompatActivity {
                     playPauseButton.setImageResource(R.drawable.gradient_play);
                 }
             } catch (Exception e) {
-
             }
         }
     }
@@ -677,8 +751,8 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     private void releaseVisualizer() {
-        if (circleLineVisualizer != null)
-            circleLineVisualizer.release();
+        if (blastVisualizer != null)
+            blastVisualizer.release();
     }
 
     private void setUpVisualizer(int sessionId) {
@@ -686,7 +760,7 @@ public class PlayerActivity extends AppCompatActivity {
             @Override
             public void run() {
                 if (sessionId != -1)
-                    circleLineVisualizer.setAudioSessionId(sessionId);
+                    blastVisualizer.setAudioSessionId(sessionId);
             }
         }, 200);
     }

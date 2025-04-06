@@ -1,10 +1,14 @@
 package com.dust.exmusic.fragments.homepagefragments;
 
+import static android.content.Context.RECEIVER_EXPORTED;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,6 +44,8 @@ public class FavoriteListFragment extends Fragment {
     private TextView title;
     private OnFavoriteListChanged onFavoriteListChanged;
 
+    private GetPath getPath;
+
     List<MainDataClass> finList = new ArrayList<>();
 
     private AllMusicsRecyclerViewAdapter allMusicsRecyclerViewAdapter;
@@ -62,11 +68,11 @@ public class FavoriteListFragment extends Fragment {
 
     private void setUpAlphaAnimation() {
         AlphaAnimation alphaAnimation = new AlphaAnimation(0f, 1f);
-        alphaAnimation.setDuration(1000);
+        alphaAnimation.setDuration(500);
         alphaAnimation.setFillAfter(true);
 
         ScaleAnimation scaleAnimation = new ScaleAnimation(0f, 1f, 0f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-        scaleAnimation.setDuration(1000);
+        scaleAnimation.setDuration(500);
 
         set.addAnimation(alphaAnimation);
         set.addAnimation(scaleAnimation);
@@ -128,12 +134,22 @@ public class FavoriteListFragment extends Fragment {
     public void onStart() {
         super.onStart();
         onFavoriteListChanged = new OnFavoriteListChanged();
-        getActivity().registerReceiver(onFavoriteListChanged, new IntentFilter("com.dust.exmusic.OnFavoriteListChanged"));
+        getPath = new GetPath();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+            getActivity().registerReceiver(getPath, new IntentFilter("com.dust.exmusic.OnReceivePath"),RECEIVER_EXPORTED);
+            getActivity().registerReceiver(onFavoriteListChanged, new IntentFilter("com.dust.exmusic.OnFavoriteListChanged"),RECEIVER_EXPORTED);
+        }else {
+            getActivity().registerReceiver(getPath, new IntentFilter("com.dust.exmusic.OnReceivePath"));
+            getActivity().registerReceiver(onFavoriteListChanged, new IntentFilter("com.dust.exmusic.OnFavoriteListChanged"));
+        }
+
     }
 
     @Override
     public void onStop() {
         getActivity().unregisterReceiver(onFavoriteListChanged);
+        getActivity().unregisterReceiver(getPath);
         super.onStop();
     }
 
@@ -146,6 +162,27 @@ public class FavoriteListFragment extends Fragment {
                 allMusicsRecyclerViewAdapter.notifyDataSetChanged();
                 sendPath();
             } catch (Exception e) {
+            }
+        }
+    }
+
+    private class GetPath extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // if user is playing favorite song then might remove that song from favorite list.
+            // this code checks if the current song that played from favorite list, doesn't exist anymore (user removed the song), then the play mode reset to ALL|ALL
+            if (sharedPreferencesCenter.getPlayPair().equals("FavoriteList|FavoriteList")){
+                String currentPath = intent.getStringExtra("PATH");
+                if (currentPath != null && !currentPath.isEmpty()){
+                    if (!sharedPreferencesCenter.checkFavoriteListPathAvailability(currentPath)){
+                        String resetMode = "ALL|ALL";
+                        sharedPreferencesCenter.setPlayPair(resetMode);
+                        sharedPreferencesCenter.setLastPlayMode(resetMode);
+                        if (!sharedPreferencesCenter.getShuffleMode().isEmpty())
+                            sharedPreferencesCenter.setShuffleMode(resetMode);
+                    }
+                }
             }
         }
     }

@@ -8,9 +8,15 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.provider.Settings;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
@@ -19,6 +25,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContract;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -52,6 +63,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.Locale;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private DrawerLayout drawerLayout;
@@ -62,7 +74,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TabLayout tableLayout;
     private AppBarLayout appbarLayout;
     private ImageView imgSearch;
-    private ImageView headerImage;
     private ImageView circle_center;
     private CardView cardView1;
     private CTextView version;
@@ -87,37 +98,56 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private SharedPreferencesCenter sharedPreferencesCenter;
 
-    private int allDataCount = 0;
     private int favDataCount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         seExTheme();
-        setUpEnglishLanguage();
         super.onCreate(savedInstanceState);
+        adjustFontScale();
         setContentView(R.layout.activity_main);
-        checkPermissions();
         setUpSharedPreferences();
         setUpRealmHandler();
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         setUpViews();
-        setUpHeaderImage();
         setUpSearchImg();
         setPrimaryImportantData();
         setUpFloatingActionButton();
     }
 
-    private void setUpEnglishLanguage() {
-        String localeStr;
-        if (new SharedPreferencesCenter(this).getEnglishLanguage())
-            localeStr = "en";
-        else
-            localeStr = "fa";
-        Locale locale = new Locale(localeStr);
-        Locale.setDefault(locale);
-        Configuration config = getResources().getConfiguration();
-        config.setLocale(locale);
-        getResources().updateConfiguration(config, getResources().getDisplayMetrics());
+    private void adjustFontScale() {
+        Configuration configuration = getResources().getConfiguration();
+        if (configuration.fontScale != 1.0f) {
+            configuration.fontScale = 1.0f;
+            DisplayMetrics metrics = getResources().getDisplayMetrics();
+            WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
+            wm.getDefaultDisplay().getMetrics(metrics);
+            metrics.scaledDensity = configuration.fontScale * metrics.density;
+            getBaseContext().getResources().updateConfiguration(configuration, metrics);
+        }
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        Context myContext = newBase;
+
+        try {
+            String localeStr;
+            if (new SharedPreferencesCenter(myContext).getEnglishLanguage())
+                localeStr = "en";
+            else
+                localeStr = "fa";
+            Locale locale = new Locale(localeStr);
+            Locale.setDefault(locale);
+
+            Configuration configuration = newBase.getResources().getConfiguration();
+            configuration.setLayoutDirection(new Locale(localeStr));
+            configuration.setLocale(locale);
+            Context newContext = newBase.createConfigurationContext(configuration);
+            if (newContext != null)
+               myContext = newContext;
+        }catch (Exception e){}
+        super.attachBaseContext(myContext);
     }
 
     private void seExTheme() {
@@ -130,13 +160,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void setPrimaryImportantData() {
-        allDataCount = handler.getAllDataCount();
         String[] favData = sharedPreferencesCenter.getFavoriteListPaths();
         if (!favData[0].equals(""))
             favDataCount = favData.length;
     }
 
     private void optimizeFloatingActionButton(int position) {
+        long allDataCount = handler.getAllDataCount();
         switch (position) {
             case 0:
                 ShuffleFloatingType = ALL_SHUFFLE_TYPE;
@@ -169,11 +199,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 sharedPreferencesCenter.setPlaylistActive("");
                 Intent intent = new Intent(MainActivity.this, PlayerActivity.class);
                 if (viewPager.getCurrentItem() == 0) {
+                    sharedPreferencesCenter.setLastPlayMode(getJoinedShuffleMode("ALL", "ALL"));
                     sharedPreferencesCenter.setShuffleMode(getJoinedShuffleMode("ALL", "ALL"));
                     intent.putExtra("PATH", handler.getMainData(1, sharedPreferencesCenter.getSortType()).get(0).getPath());
                     intent.putExtra("SHUFFLE_MODE", "ALL");
                     intent.putExtra("PLAY_LIST", "ALL|ALL");
                 } else {
+                    sharedPreferencesCenter.setLastPlayMode(getJoinedShuffleMode("FavoriteList", "FavoriteList"));
                     sharedPreferencesCenter.setShuffleMode(getJoinedShuffleMode("FavoriteList", "FavoriteList"));
                     intent.putExtra("PATH", handler.getMusicDataByPath(sharedPreferencesCenter.getFavoriteListPaths()[0]).getPath());
                     intent.putExtra("PLAY_LIST", "FavoriteList|FavoriteList");
@@ -200,12 +232,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         sharedPreferencesCenter = new SharedPreferencesCenter(this);
     }
 
-    private void setUpHeaderImage() {
-
-        headerImage.setImageResource(R.drawable.bg_one);
-
-    }
-
     private boolean checkServiceRunning() {
         ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo runningServiceInfo : activityManager.getRunningServices(Integer.MAX_VALUE)) {
@@ -225,21 +251,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void checkPermissions() {
-        if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
-            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 101);
-
-        if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED)
-            requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, 102);
-
-    }
-
     private void setUpViews() {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
         version = (CTextView) findViewById(R.id.version);
         floatingButton = (FloatingActionButton) findViewById(R.id.floatingButton);
         appbarLayout = (AppBarLayout) findViewById(R.id.appbarLayout);
-        headerImage = (ImageView) findViewById(R.id.headerImage);
         imgSearch = (ImageView) findViewById(R.id.imgSearch);
         circle_center = (ImageView) findViewById(R.id.circle_center);
         drawer = (LinearLayout) findViewById(R.id.drawer);
@@ -378,9 +394,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         onUnlockDrawer = new OnUnlockDrawer();
         onReceivePath = new OnReceivePath();
         onFavoriteListChanged = new OnFavoriteListChanged();
-        registerReceiver(onFavoriteListChanged, new IntentFilter("com.dust.exmusic.OnFavoriteListChanged"));
-        registerReceiver(onUnlockDrawer, new IntentFilter("com.dust.exmusic.UNLOCK_MAIN_DRAWER"));
-        registerReceiver(onReceivePath, new IntentFilter("com.dust.exmusic.OnReceivePath"));
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+            registerReceiver(onFavoriteListChanged, new IntentFilter("com.dust.exmusic.OnFavoriteListChanged"),RECEIVER_EXPORTED);
+            registerReceiver(onUnlockDrawer, new IntentFilter("com.dust.exmusic.UNLOCK_MAIN_DRAWER"),RECEIVER_EXPORTED);
+            registerReceiver(onReceivePath, new IntentFilter("com.dust.exmusic.OnReceivePath"),RECEIVER_EXPORTED);
+        }else {
+            registerReceiver(onFavoriteListChanged, new IntentFilter("com.dust.exmusic.OnFavoriteListChanged"));
+            registerReceiver(onUnlockDrawer, new IntentFilter("com.dust.exmusic.UNLOCK_MAIN_DRAWER"));
+            registerReceiver(onReceivePath, new IntentFilter("com.dust.exmusic.OnReceivePath"));
+        }
+
         setUpSmallCircle();
         sendBroadcast(new Intent("com.dust.exmusic.OnFavoriteListChanged"));
     }
@@ -414,11 +438,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void onGetPicture(Bitmap bitmap) {
                     if (bitmap != null) {
-                        headerImage.setImageBitmap(bitmap);
                         circle_center.setImageBitmap(bitmap);
                     } else {
                         circle_center.setImageResource(R.drawable.empty_music_pic);
-                        headerImage.setImageResource(R.drawable.empty_music_pic);
                     }
                 }
             });
@@ -432,12 +454,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     startActivity(intent1);
                 }
             });
-            headerImage.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    cardView1.performClick();
-                }
-            });
+
         }
     }
 

@@ -73,6 +73,8 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
         sourceSettings.setOnClickListener(this);
         versionSettings.setOnClickListener(this);
 
+        sourceSettings.setVisibility(View.GONE);
+
         if (sharedPreferencesCenter.getEnglishLanguage())
             version.setTypeface(null);
         version.setText(getResources().getString(R.string.version, BuildConfig.VERSION_NAME));
@@ -126,7 +128,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
                             dialog1.dismiss();
                         } else {
                             dialog1.dismiss();
-                            getActivity().recreate();
+                            requireActivity().recreate();
                         }
                     }
                 });

@@ -82,11 +82,11 @@ public class WholePlayListFragment extends Fragment {
 
     private void setUpAlphaAnimation() {
         AlphaAnimation alphaAnimation = new AlphaAnimation(0f, 1f);
-        alphaAnimation.setDuration(1000);
+        alphaAnimation.setDuration(500);
         alphaAnimation.setFillAfter(true);
 
         ScaleAnimation scaleAnimation = new ScaleAnimation(0f, 1f, 0f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-        scaleAnimation.setDuration(1000);
+        scaleAnimation.setDuration(500);
 
         set.addAnimation(alphaAnimation);
         set.addAnimation(scaleAnimation);
@@ -262,6 +262,11 @@ public class WholePlayListFragment extends Fragment {
                 for (int i = 0; i < removeList.size(); i++) {
                     sharedPreferencesCenter.removePlayList(removeList.get(i));
                     handler.deletePlayListSongs(removeList.get(i));
+                    if (sharedPreferencesCenter.getPlaylistActive().equals(removeList.get(i))){
+                        sharedPreferencesCenter.setPlaylistActive("");
+                        sharedPreferencesCenter.setLastPlayMode("ALL|ALL");
+                        sharedPreferencesCenter.setPlayPair("ALL|ALL");
+                    }
                 }
                 Toast.makeText(getActivity(), getActivity().getResources().getString(R.string.done), Toast.LENGTH_SHORT).show();
                 resetDeleteMode();
@@ -283,7 +288,7 @@ public class WholePlayListFragment extends Fragment {
     }
 
     private void sendPlayListDataChangedBroadCast() {
-        getActivity().sendBroadcast(new Intent("com.dust.exmusic.OnPlayListChanged"));
+        requireContext().sendBroadcast(new Intent("com.dust.exmusic.OnPlayListChanged"));
     }
 
     @Override

@@ -74,6 +74,7 @@ public class AlbumsDetailsFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 sharedPreferencesCenter.setPlaylistActive("");
+                sharedPreferencesCenter.setLastPlayMode(getJoinedShuffleMode("Albums", getArguments().getString("NAME")));
                 sharedPreferencesCenter.setShuffleMode(getJoinedShuffleMode("Albums", getArguments().getString("NAME")));
                 Intent intent = new Intent(getActivity(), PlayerActivity.class);
                 intent.putExtra("PATH", data.get(0).getPath());
@@ -119,11 +120,11 @@ public class AlbumsDetailsFragment extends Fragment {
 
     private void setUpAlphaAnimation() {
         AlphaAnimation alphaAnimation = new AlphaAnimation(0f, 1f);
-        alphaAnimation.setDuration(1000);
+        alphaAnimation.setDuration(500);
         alphaAnimation.setFillAfter(true);
 
         ScaleAnimation scaleAnimation = new ScaleAnimation(0f, 1f, 0f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-        scaleAnimation.setDuration(1000);
+        scaleAnimation.setDuration(500);
 
         set.addAnimation(alphaAnimation);
         set.addAnimation(scaleAnimation);

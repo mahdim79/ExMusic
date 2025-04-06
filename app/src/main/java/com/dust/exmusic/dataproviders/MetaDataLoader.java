@@ -5,9 +5,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.os.AsyncTask;
+import android.util.Log;
 
+import com.dust.exmusic.dataclasses.MainDataClass;
 import com.dust.exmusic.interfaces.OnLoadPicture;
 import com.dust.exmusic.realm.ExternalRealmHandler;
+
+import java.io.File;
+import java.io.FileInputStream;
 
 import io.realm.Realm;
 
@@ -22,9 +27,9 @@ public class MetaDataLoader {
     private final int SMALL_PIC_SIZE = 0;
 
     public MetaDataLoader(String path) {
-        MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
-        mediaMetadataRetriever.setDataSource(path);
-        this.mediaMetadataRetriever = mediaMetadataRetriever;
+            MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
+            mediaMetadataRetriever.setDataSource(path);
+            this.mediaMetadataRetriever = mediaMetadataRetriever;
 
     }
 
@@ -50,14 +55,16 @@ public class MetaDataLoader {
 
     public void getPicture(String path, OnLoadPicture onLoadPicture) {
         String key = getKey(LARGE_PIC_SIZE, path);
-        Bitmap bitmap = getCachedBitmap(key);
-        if (bitmap != null) {
-            onLoadPicture.onGetPicture(bitmap);
-            return;
+        if (key != null){
+            Bitmap bitmap = getCachedBitmap(key);
+            if (bitmap != null) {
+                onLoadPicture.onGetPicture(bitmap);
+                return;
+            }
+            this.onLoadSinglePicture = onLoadPicture;
+            GetPictureAsync getPictureAsync = new GetPictureAsync();
+            getPictureAsync.execute(path, key);
         }
-        this.onLoadSinglePicture = onLoadPicture;
-        GetPictureAsync getPictureAsync = new GetPictureAsync();
-        getPictureAsync.execute(path, key);
     }
 
     public void getLowSizePictureAsync(String path, OnLoadPicture onLoadPicture) {
@@ -76,10 +83,14 @@ public class MetaDataLoader {
     }
 
     private String getKey(int PicSize, String path) {
-        int key = new ExternalRealmHandler(Realm.getDefaultInstance()).getMusicDataByPath(path).getKey();
-        if (PicSize == LARGE_PIC_SIZE)
-            return String.valueOf(key);
-        return key + "_small";
+        MainDataClass data = new ExternalRealmHandler(Realm.getDefaultInstance()).getMusicDataByPath(path);
+        if (data != null){
+            int key = data.getKey();
+            if (PicSize == LARGE_PIC_SIZE)
+                return String.valueOf(key);
+            return key + "_small";
+        }
+        return null;
     }
 
     public class GetScaledPictureAsync extends AsyncTask<String, String, Bitmap> {
@@ -88,13 +99,16 @@ public class MetaDataLoader {
         protected Bitmap doInBackground(String... strings) {
 
             String key = getKey(SMALL_PIC_SIZE, strings[0]);
-            Bitmap bitmap1 = getCachedBitmap(key);
-            if (bitmap1 != null)
-                return bitmap1;
+            if (key != null){
+                Bitmap bitmap1 = getCachedBitmap(key);
+                if (bitmap1 != null)
+                    return bitmap1;
 
-            Bitmap bitmap = generateScaledBitmap(strings[0], 100, 100);
-            cacheBitmap(bitmap, key);
-            return bitmap;
+                Bitmap bitmap = generateScaledBitmap(strings[0], 100, 100);
+                cacheBitmap(bitmap, key);
+                return bitmap;
+            }
+            return null;
         }
 
         @Override
@@ -132,6 +146,9 @@ public class MetaDataLoader {
                 bitmap.recycle();
             return null;
         }
+
+        if (bitmap == null)
+            return bitmap;
 
         if (checkResizeNeeded(bitmap.getWidth(), bitmap.getHeight(), targetWidth, targetHeight)) {
             try {

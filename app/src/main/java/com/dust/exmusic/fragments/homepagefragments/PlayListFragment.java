@@ -1,9 +1,12 @@
 package com.dust.exmusic.fragments.homepagefragments;
 
+import static android.content.Context.RECEIVER_EXPORTED;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -65,11 +68,11 @@ public class PlayListFragment extends Fragment {
 
     private void setUpAlphaAnimation() {
         AlphaAnimation alphaAnimation = new AlphaAnimation(0f, 1f);
-        alphaAnimation.setDuration(1000);
+        alphaAnimation.setDuration(500);
         alphaAnimation.setFillAfter(true);
 
         ScaleAnimation scaleAnimation = new ScaleAnimation(0f, 1f, 0f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-        scaleAnimation.setDuration(1000);
+        scaleAnimation.setDuration(500);
 
         set.addAnimation(alphaAnimation);
         set.addAnimation(scaleAnimation);
@@ -127,7 +130,10 @@ public class PlayListFragment extends Fragment {
     public void onStart() {
         super.onStart();
         onPlayListChanged = new OnPlayListChanged();
-        getActivity().registerReceiver(onPlayListChanged, new IntentFilter("com.dust.exmusic.OnPlayListChanged"));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+            getActivity().registerReceiver(onPlayListChanged, new IntentFilter("com.dust.exmusic.OnPlayListChanged"),RECEIVER_EXPORTED);
+        else
+            getActivity().registerReceiver(onPlayListChanged, new IntentFilter("com.dust.exmusic.OnPlayListChanged"));
     }
 
     @Override
@@ -136,12 +142,16 @@ public class PlayListFragment extends Fragment {
         super.onStop();
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
     private class OnPlayListChanged extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            setUpList();
-            playListRecyclerViewAdapter.notifyDataSetChanged();
+            setUpRecyclerView();
         }
     }
 

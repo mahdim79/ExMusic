@@ -1,9 +1,12 @@
 package com.dust.exmusic.fragments.navigationviewfragments.others;
 
+import static android.content.Context.RECEIVER_EXPORTED;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -93,11 +96,11 @@ public class SinglePlayListFragment extends Fragment {
 
     private void setUpAlphaAnimation() {
         AlphaAnimation alphaAnimation = new AlphaAnimation(0f, 1f);
-        alphaAnimation.setDuration(1000);
+        alphaAnimation.setDuration(500);
         alphaAnimation.setFillAfter(true);
 
         ScaleAnimation scaleAnimation = new ScaleAnimation(0f, 1f, 0f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-        scaleAnimation.setDuration(1000);
+        scaleAnimation.setDuration(500);
 
         set.addAnimation(alphaAnimation);
         set.addAnimation(scaleAnimation);
@@ -185,11 +188,22 @@ public class SinglePlayListFragment extends Fragment {
         getActivity().sendBroadcast(intent);
 
         onItemLongClick = new OnItemLongClick();
-        getActivity().registerReceiver(onItemLongClick, new IntentFilter("com.dust.exmusic.OnItemLongClick"));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+            getActivity().registerReceiver(onItemLongClick, new IntentFilter("com.dust.exmusic.OnItemLongClick"),RECEIVER_EXPORTED);
+        }else {
+            getActivity().registerReceiver(onItemLongClick, new IntentFilter("com.dust.exmusic.OnItemLongClick"));
+        }
         onPlayListChanged = new OnPlayListChanged();
         onReceivePath = new OnReceivePath();
-        getActivity().registerReceiver(onPlayListChanged, new IntentFilter("com.dust.exmusic.OnPlayListChanged"));
-        getActivity().registerReceiver(onReceivePath, new IntentFilter("com.dust.exmusic.OnReceivePath"));
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+            getActivity().registerReceiver(onPlayListChanged, new IntentFilter("com.dust.exmusic.OnPlayListChanged"),RECEIVER_EXPORTED);
+            getActivity().registerReceiver(onReceivePath, new IntentFilter("com.dust.exmusic.OnReceivePath"),RECEIVER_EXPORTED);
+        }else {
+            getActivity().registerReceiver(onPlayListChanged, new IntentFilter("com.dust.exmusic.OnPlayListChanged"));
+            getActivity().registerReceiver(onReceivePath, new IntentFilter("com.dust.exmusic.OnReceivePath"));
+        }
+
     }
 
     @Override
@@ -248,6 +262,15 @@ public class SinglePlayListFragment extends Fragment {
                     }
                 }
             } else {
+
+                if (sharedPreferencesCenter.getPlaylistActive().equals(getArguments().getString("NAME"))){
+                    sharedPreferencesCenter.setLastPlayMode("ALL|ALL");
+                    sharedPreferencesCenter.setPlayPair("ALL|ALL");
+                    sharedPreferencesCenter.setPlaylistActive("");
+                    if (!sharedPreferencesCenter.getShuffleMode().isEmpty())
+                        sharedPreferencesCenter.setShuffleMode("");
+                }
+
                 if (finList.isEmpty()) {
                     setUpEmptyView();
                 } else {
@@ -366,7 +389,7 @@ public class SinglePlayListFragment extends Fragment {
     }
 
     private void sendPlayListDataChangedBroadCast() {
-        getActivity().sendBroadcast(new Intent("com.dust.exmusic.OnPlayListChanged"));
+        requireContext().sendBroadcast(new Intent("com.dust.exmusic.OnPlayListChanged"));
     }
 }
 

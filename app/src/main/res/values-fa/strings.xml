@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ExMusic</string>
+    <string name="app_name">آوای من</string>
     <string name="deleteItem">%d لیست انتخاب شده است</string>
     <string name="deleteSong">%d موزیک انتخاب شده است</string>
     <string name="allMusics">همه موزیک ها</string>

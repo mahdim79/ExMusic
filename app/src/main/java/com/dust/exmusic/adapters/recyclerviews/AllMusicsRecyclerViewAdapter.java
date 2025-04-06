@@ -1,10 +1,13 @@
 package com.dust.exmusic.adapters.recyclerviews;
 
+import static android.content.Context.RECEIVER_EXPORTED;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -139,7 +142,11 @@ public class AllMusicsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
                 }
             }
         }
-        context.registerReceiver(new OnReceivePath(), new IntentFilter("com.dust.exmusic.OnReceivePath"));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+            context.registerReceiver(new OnReceivePath(), new IntentFilter("com.dust.exmusic.OnReceivePath"),RECEIVER_EXPORTED);
+        else
+            context.registerReceiver(new OnReceivePath(), new IntentFilter("com.dust.exmusic.OnReceivePath"));
+
 
         class OnFavoriteListChanged extends BroadcastReceiver {
             @Override
@@ -154,7 +161,11 @@ public class AllMusicsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
                 }
             }
         }
-        context.registerReceiver(new OnFavoriteListChanged(), new IntentFilter("com.dust.exmusic.OnFavoriteListChanged"));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+            context.registerReceiver(new OnFavoriteListChanged(), new IntentFilter("com.dust.exmusic.OnFavoriteListChanged"),RECEIVER_EXPORTED);
+        else
+            context.registerReceiver(new OnFavoriteListChanged(), new IntentFilter("com.dust.exmusic.OnFavoriteListChanged"));
+
     }
 
     @Override

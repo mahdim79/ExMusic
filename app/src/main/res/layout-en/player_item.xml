@@ -18,6 +18,7 @@
             android:scaleType="centerCrop"
             android:layout_alignParentBottom="true"
             android:layout_marginEnd="0dp"
+            android:src="@drawable/empty_music_pic"
             android:layout_marginBottom="0dp"
             android:paddingEnd="90dp"
             android:paddingStart="90dp"
