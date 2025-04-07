@@ -1,23 +1,18 @@
-# ExMusic
+# AvayeMan
 
-Offline music player application developed with java
-
-## ScreenShots
-
-![alt text](https://www.linkpicture.com/q/Screenshot_20220223-134327.png)  ![alt text](https://www.linkpicture.com/q/Screenshot_20220223-134334.png)  ![alt text](https://www.linkpicture.com/q/Screenshot_20220223-134341.png)  ![alt text](https://www.linkpicture.com/q/Screenshot_20220223-134402.png)  ![alt text](https://www.linkpicture.com/q/Screenshot_20220223-134437.png)
+Offline Music Player application made with java
 
 ## About This Project
 
-ExMusic is an offline music player application. this application check internal storage and find all mp3 files. list them and lets users play the musics they want.
+AvayeMan is an offline music player application. this application check internal storage and find all mp3 files. list them and let users play their favorite songs.
 this application uses:
-- Realm for cache data
+- Realm for local cache
 - Disk Lru cache for memory cache data
 - Mediaplayer for playing musics
-- Service for play musics in background (bind service)
+- Foreground Service for playing musics in background (bind service)
 
-And finally ExTracker supports two languages (fa and en) and has light and dark theme.
+AvayeMan supports two languages (fa and en) and has light and dark theme.
 
-## How to export
+## ScreenShots
 
-The application codes doesnt obfuscated. so before sign it should become obfuscated.
-
+![alt text](https://i.postimg.cc/PJKqt3fQ/Pixel-True-Mockup-5.png)  ![alt text](https://i.postimg.cc/zXXBdrpt/Pixel-True-Mockup-6.png)  ![alt text](https://i.postimg.cc/L4V5BXkg/Pixel-True-Mockup-7.png)  ![alt text](https://i.postimg.cc/gjGJbFp0/Pixel-True-Mockup-8.png) 
