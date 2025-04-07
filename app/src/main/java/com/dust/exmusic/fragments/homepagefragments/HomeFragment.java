@@ -83,7 +83,8 @@ public class HomeFragment extends Fragment {
     private ActivityResultLauncher<String> externalRecordAudio = registerForActivityResult(new ActivityResultContracts.RequestPermission(), new ActivityResultCallback<Boolean>() {
         @Override
         public void onActivityResult(Boolean result) {
-            checkPermissions();
+            if (result)
+                checkPermissions();
         }
     });
 

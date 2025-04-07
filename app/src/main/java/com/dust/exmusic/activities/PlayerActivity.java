@@ -1,5 +1,6 @@
 package com.dust.exmusic.activities;
 
+import android.Manifest;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -7,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.media.MediaPlayer;
@@ -751,7 +753,7 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     private void releaseVisualizer() {
-        if (blastVisualizer != null)
+        if (blastVisualizer != null && hasRecordAudioPermission())
             blastVisualizer.release();
     }
 
@@ -759,9 +761,13 @@ public class PlayerActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (sessionId != -1)
+                if (sessionId != -1 && hasRecordAudioPermission())
                     blastVisualizer.setAudioSessionId(sessionId);
             }
         }, 200);
+    }
+
+    private boolean hasRecordAudioPermission(){
+        return checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED;
     }
 }
